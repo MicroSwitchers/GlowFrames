@@ -17,11 +17,11 @@ body {
     left: 0;
     height: 100%;
     width: 280px;
-    background: rgba(17, 17, 17, 0.95);
+    background: rgb(34, 33, 31);
     transform: translateX(-280px);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
-    color: white;
+    color: rgb(245, 242, 236);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -33,9 +33,9 @@ body {
     position: absolute;
     right: -48px;
     top: 16px;
-    background: rgb(35, 35, 35);
+    background: rgb(44, 42, 39);
     border: none;
-    color: white;
+    color: rgb(245, 242, 236);
     padding: 12px;
     cursor: pointer;
     border-radius: 0 8px 8px 0;
@@ -52,7 +52,7 @@ body {
     height: 100vh;
     padding: 24px;
     overflow-y: auto;
-    color: white;
+    color: rgb(245, 242, 236);
     position: relative;
     scroll-behavior: smooth;
     overscroll-behavior: contain;
@@ -64,7 +64,7 @@ body {
     gap: 18px;
     margin-bottom: 32px;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(214, 211, 205, 0.1);
 }
 
 .app-logo {
@@ -77,7 +77,7 @@ body {
     margin: 0;
     font-size: 24px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgb(245, 242, 236);
     letter-spacing: 0.5px;
 }
 
@@ -91,9 +91,9 @@ body {
 .shape-button {
     width: 100%;
     padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.95);
+    background: rgba(61, 59, 54, 0.5);
+    border: 1px solid rgba(214, 211, 205, 0.2);
+    color: rgb(245, 242, 236);
     cursor: pointer;
     border-radius: 8px;
     display: flex;
@@ -105,14 +105,14 @@ body {
 }
 
 .shape-button:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(99, 95, 89, 0.6);
+    border-color: rgba(214, 211, 205, 0.4);
     transform: translateY(-1px);
 }
 
 .shape-button.active {
-    background: rgba(68, 136, 255, 0.15);
-    border-color: rgba(68, 136, 255, 0.3);
+    background: rgba(196, 181, 153, 0.2);
+    border-color: rgba(196, 181, 153, 0.4);
 }
 
 .shape-button svg {
@@ -124,13 +124,13 @@ body {
 .control-section {
     margin-top: 28px;
     padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(214, 211, 205, 0.1);
 }
 
 .control-section label {
     display: block;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgb(245, 242, 236);
     margin-bottom: 12px;
 }
 
@@ -139,28 +139,28 @@ body {
     align-items: center;
     cursor: pointer;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(82, 79, 73, 0.5);
+    border: 1px solid rgba(214, 211, 205, 0.2);
     border-radius: 8px;
     transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
 }
 
 .checkbox-label:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(99, 95, 89, 0.6);
+    border-color: rgba(214, 211, 205, 0.4);
 }
 
 .checkbox-label input[type="checkbox"] {
     margin-right: 12px;
     width: 16px;
     height: 16px;
-    accent-color: #4488ff;
+    accent-color: rgb(196, 181, 153);
 }
 
 .checkbox-description {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(245, 242, 236, 0.7);
     margin-top: 8px;
     margin-left: 12px;
     margin-bottom: 16px;
@@ -180,7 +180,7 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-runnable-track {
     height: 8px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(82, 79, 73, 0.5);
     border-radius: 4px;
 }
 
@@ -189,16 +189,20 @@ input[type="range"]::-webkit-slider-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: #4488ff;
-    border: 2px solid #ffffff;
+    background: rgb(196, 181, 153);
+    border: 2px solid rgb(245, 242, 236);
     margin-top: -8px;
     cursor: pointer;
     transition: transform 0.2s;
 }
 
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
 .collapsible-section {
     margin-top: auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(214, 211, 205, 0.1);
 }
 
 .collapsible-header {
@@ -206,7 +210,7 @@ input[type="range"]::-webkit-slider-thumb {
     padding: 16px 0;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgb(245, 242, 236);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -243,15 +247,15 @@ input[type="range"]::-webkit-slider-thumb {
     justify-content: space-between;
     margin-bottom: 8px;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(245, 242, 236, 0.7);
 }
 
 .reset-button {
     width: 100%;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.9);
+    background: rgba(82, 79, 73, 0.5);
+    border: 1px solid rgba(214, 211, 205, 0.2);
+    color: rgb(245, 242, 236);
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
@@ -261,8 +265,8 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .reset-button:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(99, 95, 89, 0.6);
+    border-color: rgba(214, 211, 205, 0.4);
     transform: translateY(-1px);
 }
 
@@ -272,16 +276,16 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .drawer-inner::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(82, 79, 73, 0.3);
 }
 
 .drawer-inner::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(196, 181, 153, 0.3);
     border-radius: 3px;
 }
 
 .drawer-inner::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(196, 181, 153, 0.5);
 }
 
 /* Shape styles */
@@ -309,7 +313,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 .bounding-box {
     position: absolute;
-    border: 2px solid #4488ff;
+    border: 2px solid rgb(196, 181, 153);
     pointer-events: none;
     display: none;
 }
@@ -327,7 +331,7 @@ input[type="range"]::-webkit-slider-thumb {
     width: 32px;
     height: 32px;
     background: white;
-    border: 2px solid #4488ff;
+    border: 2px solid rgb(196, 181, 153);
     pointer-events: auto;
     z-index: 1000;
     cursor: se-resize;

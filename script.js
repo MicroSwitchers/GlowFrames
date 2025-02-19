@@ -147,6 +147,7 @@ function updateShapeColor(shape) {
 function createBoundingBox(shape) {
     const box = document.createElement('div');
     box.className = 'bounding-box';
+    box.dataset.shape = shape.dataset.shape;
     
     const handle = document.createElement('div');
     handle.className = 'resize-handle';
@@ -175,9 +176,6 @@ function updateBoundingBox(shape) {
     box.style.height = shape.style.height;
     box.style.left = shape.style.left;
     box.style.top = shape.style.top;
-    if (shape.classList.contains('circle')) {
-        box.style.borderRadius = '50%';
-    }
 }
 
 // Event listeners for color controls
@@ -206,9 +204,11 @@ document.querySelectorAll('.shape-button').forEach(button => {
         // Create shape with larger initial size
         const shape = document.createElement('div');
         shape.className = `shape ${button.dataset.shape}`;
-        const initialSize = 200;
-        shape.style.width = `${initialSize}px`;
-        shape.style.height = `${initialSize}px`;
+        shape.dataset.shape = button.dataset.shape;
+        const initialSize = 200; // Keep initial size larger than minimum
+        const minSize = 100;  // Define minimum size
+        shape.style.width = `${Math.max(initialSize, minSize)}px`;
+        shape.style.height = `${Math.max(initialSize, minSize)}px`;
 
         // Position in center with offset
         shape.style.left = `${(viewportWidth - initialSize) / 2 + offset}px`;
@@ -277,11 +277,25 @@ function setupShapeInteraction(shape) {
         if (isResizing) {
             const dx = touch.clientX - startX;
             const dy = touch.clientY - startY;
-            const dragDistance = Math.max(dx, dy);
-            const newSize = Math.max(20, initialRect.width + dragDistance);
 
-            shape.style.width = `${newSize}px`;
-            shape.style.height = `${newSize}px`;
+            // Allow independent width and height changes for squares
+            if (shape.dataset.shape === 'square') {
+                const minSize = 100; // Increased minimum size for better interaction
+                const newWidth = Math.max(minSize, initialRect.width + dx);
+                const newHeight = Math.max(minSize, initialRect.height + dy);
+                
+                shape.style.width = `${newWidth}px`;
+                shape.style.height = `${newHeight}px`;
+            } else {
+                // Circles maintain aspect ratio
+                const dragDistance = Math.max(dx, dy);
+                const minSize = 100; // Increased minimum size for better interaction
+                const newSize = Math.max(minSize, initialRect.width + dragDistance);
+                
+                shape.style.width = `${newSize}px`;
+                shape.style.height = `${newSize}px`;
+            }
+            
             updateBoundingBox(shape);
         }
         else if (isDragging) {
@@ -349,15 +363,6 @@ function toggleFullSurface() {
     if (isFullyIlluminated) {
         previousAmbientValue = ambientSlider.value;
         ambientSlider.value = 100;
-        
-        const shapes = document.querySelectorAll('.shape');
-        shapes.forEach(shape => {
-            shape.remove();
-            if (shape.boundingBox) {
-                shape.boundingBox.remove();
-            }
-        });
-        selectedShape = null;
     } else {
         ambientSlider.value = previousAmbientValue;
     }
