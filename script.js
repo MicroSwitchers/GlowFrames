@@ -1,3 +1,26 @@
+// DOM Elements
+const drawer = document.querySelector('.drawer');
+const drawerToggle = document.querySelector('.drawer-toggle');
+const canvas = document.getElementById('canvas');
+const warmthSlider = document.getElementById('warmth');
+const ambientSlider = document.getElementById('ambient');
+const lockCanvasControl = document.getElementById('canvasLock');
+const illuminateFullSurfaceBtn = document.getElementById('illuminateFullSurface');
+const redSlider = document.getElementById('redSlider');
+const greenSlider = document.getElementById('greenSlider');
+const blueSlider = document.getElementById('blueSlider');
+const redValue = document.getElementById('redValue');
+const greenValue = document.getElementById('greenValue');
+const blueValue = document.getElementById('blueValue');
+const resetRGBBtn = document.getElementById('resetRGB');
+
+// State variables
+let selectedShape = null;
+let isLocked = false;
+let isFullyIlluminated = false;
+let previousAmbientValue = 0;
+let baseColor = [255, 255, 255];
+
 // Full screen functionality
 const fullscreenToggle = document.getElementById('fullscreenToggle');
 
@@ -30,21 +53,17 @@ document.addEventListener('webkitfullscreenchange', () => {
 });
 document.addEventListener('msfullscreenchange', () => {
     fullscreenToggle.checked = document.msFullscreenElement !== null;
-});// DOM Elements
-const drawer = document.querySelector('.drawer');
-const drawerContent = document.querySelector('.drawer-content');
-const drawerToggle = document.querySelector('.drawer-toggle');
-
-// Add mouse wheel scrolling
-drawer.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const scrollSpeed = 1.5; // Adjust this value to change scroll sensitivity
-    drawer.scrollTop += e.deltaY * scrollSpeed;
 });
 
-// Add touch scrolling
+// Drawer scrolling functionality
 let touchStartY = 0;
 let scrollStartY = 0;
+
+drawer.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const scrollSpeed = 1.5;
+    drawer.scrollTop += e.deltaY * scrollSpeed;
+}, { passive: false });
 
 drawer.addEventListener('touchstart', (e) => {
     touchStartY = e.touches[0].clientY;
@@ -57,39 +76,12 @@ drawer.addEventListener('touchmove', (e) => {
     drawer.scrollTop = scrollStartY + diff;
 }, { passive: true });
 
-// Add mouse wheel scrolling
-drawer.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    drawer.scrollTop += e.deltaY;
-}, { passive: false });
-
-// Rest of the JavaScript code...
-const canvas = document.getElementById('canvas');
-const warmthSlider = document.getElementById('warmth');
-const ambientSlider = document.getElementById('ambient');
-const lockCanvasControl = document.getElementById('canvasLock');
-const illuminateFullSurfaceBtn = document.getElementById('illuminateFullSurface');
-const redSlider = document.getElementById('redSlider');
-const greenSlider = document.getElementById('greenSlider');
-const blueSlider = document.getElementById('blueSlider');
-const redValue = document.getElementById('redValue');
-const greenValue = document.getElementById('greenValue');
-const blueValue = document.getElementById('blueValue');
-const resetRGBBtn = document.getElementById('resetRGB');
-
-// State variables
-let selectedShape = null;
-let isLocked = false;
-let isFullyIlluminated = false;
-let previousAmbientValue = 0;
-let baseColor = [255, 255, 255];
-
-// Set up drawer toggle
+// Drawer toggle
 drawerToggle.addEventListener('click', () => {
     drawer.classList.toggle('open');
 });
 
-// Set up collapsible RGB controls
+// RGB Controls collapsible section
 const rgbSection = document.querySelector('.collapsible-section');
 const rgbHeader = rgbSection.querySelector('.collapsible-header');
 const rgbContent = rgbSection.querySelector('.collapsible-content');
@@ -104,11 +96,11 @@ rgbHeader.addEventListener('click', () => {
     }
 });
 
-// Color functions
+// Color management functions
 function getWarmColor(warmth) {
     const r = baseColor[0];
-    const g = Math.round(baseColor[1] * (0.93 + (warmth * 0.0007))); // Less green as warmth increases
-    const b = Math.round(baseColor[2] * (0.84 + (warmth * 0.0016))); // Less blue as warmth increases
+    const g = Math.round(baseColor[1] * (0.93 + (warmth * 0.0007)));
+    const b = Math.round(baseColor[2] * (0.84 + (warmth * 0.0016)));
     return [r, g, b];
 }
 
@@ -203,7 +195,7 @@ document.querySelectorAll('.shape-button').forEach(button => {
         // Create shape with larger initial size
         const shape = document.createElement('div');
         shape.className = `shape ${button.dataset.shape}`;
-        const initialSize = 200; // Doubled from 50px
+        const initialSize = 200;
         shape.style.width = `${initialSize}px`;
         shape.style.height = `${initialSize}px`;
 
