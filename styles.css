@@ -1,0 +1,1013 @@
+.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 100vh;
+    background: linear-gradient(to right, rgb(22, 22, 24), rgb(28, 28, 32));
+    transform: translateX(-300px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    user-select: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.drawer-toggle {
+    position: absolute;
+    right: -48px;
+    top: 16px;
+    background: linear-gradient(to right, rgb(22, 22, 24), rgb(28, 28, 32));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-left: none;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    box-shadow: 4px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.shape-button {
+    width: 100%;
+    padding: 14px 16px;
+    background: linear-gradient(to bottom, rgba(40, 40, 45, 0.6), rgba(35, 35, 40, 0.6));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s;
+    font-size: 15px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.shape-button:hover {
+    background: linear-gradient(to bottom, rgba(45, 45, 50, 0.8), rgba(40, 40, 45, 0.8));
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.control-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(to bottom, 
+        rgba(30, 30, 35, 0) 0%,
+        rgba(30, 30, 35, 0.3) 10%,
+        rgba(30, 30, 35, 0) 100%
+    );
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.15));
+    border-radius: 2px;
+    margin: 8px 0 24px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(to bottom, #4488ff, #3377ee);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.drawer-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px 20px 20px 20px;
+    overflow-y: scroll;
+    color: white;
+    cursor: grab;
+    scrollbar-width: 12px;
+    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(26, 26, 30, 0.8);
+}
+
+.drawer-inner::-webkit-scrollbar {
+    width: 12px;
+    background-color: rgba(26, 26, 30, 0.8);
+}
+
+.drawer-inner::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.25)
+    );
+    border-radius: 6px;
+    border: 2px solid rgba(26, 26, 30, 0.8);
+}
+
+.drawer-inner::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0.25),
+        rgba(255, 255, 255, 0.3)
+    );
+}
+
+.drawer-inner::-webkit-scrollbar-track {
+    background-color: rgba(26, 26, 30, 0.8);
+    border-radius: 6px;
+}
+
+.checkbox-label {
+    background: linear-gradient(to right, rgba(35, 35, 40, 0.4), rgba(40, 40, 45, 0.4));
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 100vh;
+    background: rgba(17, 17, 17, 0.98);
+    transform: translateX(-300px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    user-select: none;
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-toggle {
+    position: absolute;
+    right: -48px;
+    top: 16px;
+    background: rgb(17, 17, 17);
+    border: none;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.drawer-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    overflow-y: scroll;
+    color: white;
+    cursor: grab;
+}
+
+.drawer-inner h2 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    color: rgba(255, 255, 255, 0.95);
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.shape-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.shape-button {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s;
+    font-size: 15px;
+}
+
+.shape-button:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.shape-button.active {
+    background: rgba(68, 136, 255, 0.15);
+    border-color: rgba(68, 136, 255, 0.3);
+}
+
+.shape-button svg {
+    opacity: 0.9;
+    width: 18px;
+    height: 18px;
+}
+
+.control-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.control-section label {
+    display: block;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 16px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-description {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 6px;
+    margin-left: 28px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    margin: 8px 0 24px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #4488ff;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+.collapsible-section {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.collapsible-header {
+    width: 100%;
+    padding: 16px 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+
+.rgb-controls {
+    padding: 20px 0;
+}
+
+.slider-group {
+    margin-bottom: 20px;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.reset-button {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+}
+
+.reset-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+/* Custom scrollbar styling */
+.drawer-inner::-webkit-scrollbar {
+    width: 8px;
+}
+
+.drawer-inner::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.drawer-inner::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.drawer-inner::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(17, 17, 17, 0.98);
+    transform: translateX(-280px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    user-select: none;
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-toggle {
+    position: absolute;
+    right: -48px;
+    top: 16px;
+    background: rgb(17, 17, 17);
+    border: none;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.drawer-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 24px;
+    overflow-y: scroll;
+    color: white;
+    cursor: grab;
+}
+
+.drawer-inner h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.9);
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shape-button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.shape-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.shape-button.active {
+    background: rgba(68, 136, 255, 0.15);
+    border-color: rgba(68, 136, 255, 0.3);
+}
+
+.shape-button svg {
+    opacity: 0.9;
+}
+
+.control-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-section label {
+    display: block;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin: 8px 0 16px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #4488ff;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+.collapsible-section {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.collapsible-header {
+    width: 100%;
+    padding: 16px 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.arrow-icon {
+    transition: transform 0.2s;
+    opacity: 0.7;
+}
+
+.collapsible-section.open .arrow-icon {
+    transform: rotate(180deg);
+}
+
+.rgb-controls {
+    padding: 16px 0;
+}
+
+.slider-group {
+    margin-bottom: 16px;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.reset-button {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+.reset-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Custom scrollbar styling */
+.drawer-inner::-webkit-scrollbar {
+    width: 4px;
+}
+
+.drawer-inner::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.drawer-inner::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.drawer-inner::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(17, 17, 17, 0.95);
+    transform: translateX(-280px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-toggle {
+    position: absolute;
+    right: -48px;
+    top: 16px;
+    background: rgb(17, 17, 17);
+    border: none;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+.drawer-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 32px 24px;
+    overflow-y: scroll;
+    color: white;
+    cursor: grab;
+}
+
+.drawer-inner:active {
+    cursor: grabbing;
+}
+
+/* Custom scrollbar styling */
+.drawer-inner::-webkit-scrollbar {
+    width: 6px;
+}
+
+.drawer-inner::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.drawer-inner::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.drawer-inner::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.shape, .delete-button, .resize-handle, .drawer-toggle {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(17, 17, 17, 0.95);
+    transform: translateX(-280px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.shape, .delete-button, .resize-handle, .drawer-toggle {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-toggle {
+    position: absolute;
+    right: -48px;
+    top: 16px;
+    background: rgb(17, 17, 17);
+    border: none;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+.drawer-inner {
+    height: 100vh;
+    padding: 32px 24px;
+    overflow-y: auto;
+    color: white;
+    cursor: default;
+    scroll-behavior: smooth;
+}
+
+.drawer-inner:active {
+    cursor: grabbing;
+}
+
+/* Empty space should show grab cursor */
+.drawer-inner:hover {
+    cursor: grab;
+}
+
+/* Custom scrollbar styling */
+.drawer-inner::-webkit-scrollbar {
+    width: 6px;
+}
+
+.drawer-inner::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.drawer-inner::-webkit-scrollbar-thumb {
+    background: rgba(239, 252, 7, 0.3);
+    border-radius: 3px;
+}
+
+.drawer-inner::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(17, 17, 17, 0.95);
+    transform: translateX(-280px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-inner {
+    height: calc(100vh - 64px); /* Account for padding */
+    padding: 32px 24px;
+    overflow-y: auto;
+    color: white;
+    position: relative;
+}
+
+/* Custom scrollbar styling */
+.drawer-inner::-webkit-scrollbar {
+    width: 6px;
+}
+
+.drawer-inner::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.drawer-inner::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.drawer-inner::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body { 
+    height: 100vh; 
+    overflow: hidden; 
+    touch-action: none; 
+    background: black; 
+}
+
+.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 280px;
+    background: rgba(17, 17, 17, 0.95);
+    transform: translateX(-280px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    padding: 32px 24px;
+    color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.drawer.open { 
+    transform: translateX(0); 
+}
+
+.drawer-toggle {
+    position: absolute;
+    right: -48px;
+    top: 16px;
+    background: rgb(17, 17, 17);
+    border: none;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 0 8px 8px 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shape-button {
+    width: 100%;
+    padding: 16px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+}
+
+.shape-button:hover { 
+    background: rgba(255, 255, 255, 0.1); 
+}
+
+.shape-button.active { 
+    background: rgba(68, 136, 255, 0.2);
+    border-color: rgba(68, 136, 255, 0.4);
+}
+
+.control-section { 
+    margin-top: 32px; 
+    padding-top: 24px; 
+    border-top: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.collapsible-section {
+    margin-top: auto !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.collapsible-section .collapsible-header {
+    width: 100%;
+    padding: 12px 0;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.collapsible-section .arrow-icon {
+    transition: transform 0.3s;
+}
+
+.collapsible-section.open .arrow-icon {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease-out;
+}
+
+.collapsible-section.open .collapsible-content {
+    height: auto;
+}
+
+.rgb-controls {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.slider-group {
+    margin-bottom: 16px;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+}
+
+.reset-button {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-bottom: 16px;
+}
+
+.reset-button:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.drawer {
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 36px;
+    background: transparent;
+    margin: 8px 0;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: #4488ff;
+    border: 2px solid #fff;
+    margin-top: -8px;
+    cursor: pointer;
+}
+
+.shape {
+    position: absolute;
+    cursor: move;
+    touch-action: none;
+    transition: all 0.2s;
+    background: white;
+}
+
+.shape.circle { 
+    border-radius: 50%; 
+}
+
+.shape.locked { 
+    cursor: default !important; 
+    pointer-events: none; 
+}
+
+.bounding-box {
+    position: absolute;
+    border: 2px solid #4488ff;
+    pointer-events: none;
+    display: none;
+}
+
+.bounding-box.circle { 
+    border-radius: 50%; 
+}
+
+.resize-handle {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border: 2px solid #4488ff;
+    pointer-events: auto;
+    z-index: 1000;
+    cursor: se-resize;
+    bottom: -9px;
+    right: -9px;
+    border-radius: 50%;
+}
+
+.delete-button {
+    position: absolute;
+    top: -32px;
+    right: -32px;
+    background: #ff4444;
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    font-size: 20px;
+}
+
+.delete-button:hover { 
+    background: #cc3333; 
+}
+
+#canvas { 
+    width: 100vw; 
+    height: 100vh; 
+    background: black; 
+    position: relative; 
+}

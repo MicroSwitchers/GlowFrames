@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masking Light Box</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="drawer">
+        <button class="drawer-toggle">☰</button>
+        <div class="drawer-inner">
+            <h2 style="margin-bottom: 16px;">Backlight and Light Masks</h2>
+            <div class="shape-buttons-container">
+                <button class="shape-button" data-shape="circle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    Circle
+                </button>
+                <button class="shape-button" data-shape="square">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="4" width="16" height="16"/>
+                    </svg>
+                    Square
+                </button>
+                <button class="shape-button" id="illuminateFullSurface">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="12" y1="3" x2="12" y2="21"/>
+                    </svg>
+                    Full Surface
+                </button>
+            </div>
+
+            <div class="control-section">
+                <label>Background Light</label>
+                <input type="range" id="ambient" min="0" max="100" value="0">
+                
+                <div style="margin-top: 24px;">
+                    <label>Light Warmth</label>
+                    <input type="range" id="warmth" min="0" max="100" value="0">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="fullscreenToggle">
+                    <span>Full Screen</span>
+                </label>
+                <div class="checkbox-description">
+                    Toggles full screen mode for the application
+                </div>
+            </div>
+
+            <div class="control-section">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="canvasLock">
+                    <span>Lock Canvas</span>
+                </label>
+                <div class="checkbox-description">
+                    Prevents shapes from being moved or adjusted
+                </div>
+            </div>
+
+            <div class="control-section collapsible-section">
+                <button class="collapsible-header">
+                    <span>RGB Fine Tuning</span>
+                    <svg class="arrow-icon" width="12" height="12" viewBox="0 0 12 12">
+                        <path d="M2 4L6 8L10 4" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                <div class="collapsible-content">
+                    <div class="rgb-controls">
+                        <button id="resetRGB" class="reset-button">
+                            Reset to White
+                        </button>
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <label>Red</label>
+                                <span id="redValue">255</span>
+                            </div>
+                            <input type="range" id="redSlider" min="40" max="255" value="255">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <label>Green</label>
+                                <span id="greenValue">255</span>
+                            </div>
+                            <input type="range" id="greenSlider" min="40" max="255" value="255">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <label>Blue</label>
+                                <span id="blueValue">255</span>
+                            </div>
+                            <input type="range" id="blueSlider" min="40" max="255" value="255">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="canvas"></div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
