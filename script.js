@@ -81,6 +81,11 @@ drawerToggle.addEventListener('click', () => {
     drawer.classList.toggle('open');
 });
 
+drawerToggle.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    drawer.classList.toggle('open');
+}, { passive: false });
+
 // RGB Controls collapsible section
 const rgbSection = document.querySelector('.collapsible-section');
 const rgbHeader = rgbSection.querySelector('.collapsible-header');
@@ -187,7 +192,13 @@ document.querySelectorAll('.shape-button').forEach(button => {
     
     let offset = 0; // Track shape offset
 
-    button.addEventListener('click', () => {
+    button.addEventListener('click', createShape);
+    button.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        createShape();
+    }, { passive: false });
+
+    function createShape() {
         // Get the center of the viewport
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
@@ -214,7 +225,7 @@ document.querySelectorAll('.shape-button').forEach(button => {
         
         canvas.appendChild(shape);
         setupShapeInteraction(shape);
-    });
+    }
 });
 
 function setupShapeInteraction(shape) {
@@ -222,47 +233,50 @@ function setupShapeInteraction(shape) {
     let isResizing = false;
     let initialRect, startX, startY;
 
-    shape.addEventListener('mousedown', (e) => {
+    // Mouse Events
+    shape.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+
+    // Touch Events
+    shape.addEventListener('touchstart', handleStart, { passive: false });
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+    document.addEventListener('touchcancel', handleEnd);
+
+    // Handle both mouse and touch start
+    function handleStart(e) {
         if (isLocked) return;
+
+        // Prevent scrolling while dragging on mobile
+        e.preventDefault();
         
         if (selectedShape && selectedShape !== shape) {
             selectedShape.boundingBox.style.display = 'none';
         }
         selectedShape = shape;
         shape.boundingBox.style.display = 'block';
+
+        const touch = e.touches ? e.touches[0] : e;
+        initialRect = shape.getBoundingClientRect();
+        startX = touch.clientX;
+        startY = touch.clientY;
         
         if (!e.target.classList.contains('resize-handle')) {
             isDragging = true;
-            initialRect = shape.getBoundingClientRect();
-            startX = e.clientX;
-            startY = e.clientY;
         }
-    });
+    }
 
-    shape.boundingBox.querySelector('.resize-handle').addEventListener('mousedown', (e) => {
-        if (isLocked) return;
-        
-        e.stopPropagation();
-        isResizing = true;
-        initialRect = shape.getBoundingClientRect();
-        startX = e.clientX;
-        startY = e.clientY;
-    });
-
-    shape.boundingBox.querySelector('.delete-button').addEventListener('click', () => {
-        if (isLocked) return;
-        
-        shape.remove();
-        shape.boundingBox.remove();
-        selectedShape = null;
-    });
-
-    document.addEventListener('mousemove', (e) => {
+    // Handle both mouse and touch move
+    function handleMove(e) {
         if (isLocked || (!isDragging && !isResizing)) return;
 
+        e.preventDefault();
+        const touch = e.touches ? e.touches[0] : e;
+        
         if (isResizing) {
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
             const dragDistance = Math.max(dx, dy);
             const newSize = Math.max(20, initialRect.width + dragDistance);
 
@@ -271,23 +285,64 @@ function setupShapeInteraction(shape) {
             updateBoundingBox(shape);
         }
         else if (isDragging) {
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
             
             shape.style.left = `${initialRect.left + dx}px`;
             shape.style.top = `${initialRect.top + dy}px`;
             updateBoundingBox(shape);
         }
-    });
+    }
 
-    document.addEventListener('mouseup', () => {
+    // Handle both mouse and touch end
+    function handleEnd() {
         isDragging = false;
         isResizing = false;
-    });
+    }
+
+    // Resize handle events
+    const resizeHandle = shape.boundingBox.querySelector('.resize-handle');
+    resizeHandle.addEventListener('mousedown', handleResizeStart);
+    resizeHandle.addEventListener('touchstart', handleResizeStart, { passive: false });
+
+    function handleResizeStart(e) {
+        if (isLocked) return;
+        
+        e.stopPropagation();
+        e.preventDefault();
+        
+        isResizing = true;
+        const touch = e.touches ? e.touches[0] : e;
+        initialRect = shape.getBoundingClientRect();
+        startX = touch.clientX;
+        startY = touch.clientY;
+    }
+
+    // Delete button events
+    const deleteBtn = shape.boundingBox.querySelector('.delete-button');
+    deleteBtn.addEventListener('mousedown', handleDelete);
+    deleteBtn.addEventListener('touchstart', handleDelete, { passive: false });
+
+    function handleDelete(e) {
+        if (isLocked) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        shape.remove();
+        shape.boundingBox.remove();
+        selectedShape = null;
+    }
 }
 
 // Full surface illumination
-illuminateFullSurfaceBtn.addEventListener('click', () => {
+illuminateFullSurfaceBtn.addEventListener('click', toggleFullSurface);
+illuminateFullSurfaceBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    toggleFullSurface();
+}, { passive: false });
+
+function toggleFullSurface() {
     isFullyIlluminated = !isFullyIlluminated;
     illuminateFullSurfaceBtn.classList.toggle('active', isFullyIlluminated);
 
@@ -307,7 +362,7 @@ illuminateFullSurfaceBtn.addEventListener('click', () => {
         ambientSlider.value = previousAmbientValue;
     }
     updateBackground();
-});
+}
 
 // Canvas lock functionality
 lockCanvasControl.addEventListener('change', (e) => {
@@ -340,9 +395,12 @@ warmthSlider.addEventListener('input', () => {
 ambientSlider.addEventListener('input', updateBackground);
 
 // Canvas click handler
-canvas.addEventListener('click', (e) => {
+canvas.addEventListener('click', handleCanvasClick);
+canvas.addEventListener('touchstart', handleCanvasClick);
+
+function handleCanvasClick(e) {
     if (e.target === canvas && selectedShape) {
         selectedShape.boundingBox.style.display = 'none';
         selectedShape = null;
     }
-});
+}
