@@ -353,15 +353,15 @@ body {
 /* Resize handle */
 .resize-handle {
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 30px;            /* Increased from 20px */
+    height: 30px;           /* Increased from 20px */
     background: var(--color-accent);
-    border: 2px solid var(--color-text);
+    border: 3px solid var(--color-text);  /* Increased from 2px */
     pointer-events: auto;
     z-index: 1000;
     cursor: se-resize;
-    bottom: -10px;
-    right: -10px;
+    bottom: -15px;          /* Adjusted for new size */
+    right: -15px;          /* Adjusted for new size */
     border-radius: 50%;
     touch-action: none;
     transition: transform 0.2s;
@@ -598,6 +598,14 @@ input[type="range"]#blueSlider::-moz-range-thumb {
 
     .bounding-box {
         border-width: 6px; /* Slightly thicker for touch devices */
+    }
+
+    .resize-handle {
+        width: 40px;        /* Even larger for touch devices */
+        height: 40px;       /* Even larger for touch devices */
+        bottom: -20px;      /* Adjusted for touch size */
+        right: -20px;       /* Adjusted for touch size */
+        border-width: 4px;  /* Thicker border for touch devices */
     }
 }
 
