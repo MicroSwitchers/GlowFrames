@@ -181,9 +181,9 @@ const BoundingBoxManager = {
             document.removeEventListener('touchmove', resize);
             document.removeEventListener('touchend', stopResize);
             
-            // Ensure shape stays selected
-            AppState.selectedShape = shape;
-            BoundingBoxManager.show(shape);
+            // Hide bounding box after resize
+            BoundingBoxManager.hide(shape);
+            AppState.selectedShape = null;
         };
 
         // Add event listeners
