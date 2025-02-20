@@ -1,411 +1,533 @@
-// DOM Elements
-const drawer = document.querySelector('.drawer');
-const drawerToggle = document.querySelector('.drawer-toggle');
-const canvas = document.getElementById('canvas');
-const warmthSlider = document.getElementById('warmth');
-const ambientSlider = document.getElementById('ambient');
-const lockCanvasControl = document.getElementById('canvasLock');
-const illuminateFullSurfaceBtn = document.getElementById('illuminateFullSurface');
-const redSlider = document.getElementById('redSlider');
-const greenSlider = document.getElementById('greenSlider');
-const blueSlider = document.getElementById('blueSlider');
-const redValue = document.getElementById('redValue');
-const greenValue = document.getElementById('greenValue');
-const blueValue = document.getElementById('blueValue');
-const resetRGBBtn = document.getElementById('resetRGB');
+// State management
+const AppState = {
+    selectedShape: null,
+    isLocked: false,
+    isFullyIlluminated: false,
+    previousAmbientValue: 0,
+    baseColor: [255, 255, 255],
+    highContrastMode: false,
+    focusedShape: null
+};
 
-// State variables
-let selectedShape = null;
-let isLocked = false;
-let isFullyIlluminated = false;
-let previousAmbientValue = 0;
-let baseColor = [255, 255, 255];
-
-// Full screen functionality
-const fullscreenToggle = document.getElementById('fullscreenToggle');
-
-fullscreenToggle.addEventListener('change', () => {
-    if (fullscreenToggle.checked) {
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen();
-        } else if (document.documentElement.msRequestFullscreen) {
-            document.documentElement.msRequestFullscreen();
-        }
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
+// DOM Elements management
+const Elements = {
+    drawer: document.querySelector('.drawer'),
+    drawerToggle: document.querySelector('.drawer-toggle'),
+    canvas: document.getElementById('canvas'),
+    controls: {
+        warmth: document.getElementById('warmth'),
+        ambient: document.getElementById('ambient'),
+        lockCanvas: document.getElementById('canvasLock'),
+        fullSurface: document.getElementById('illuminateFullSurface'),
+        fullscreen: document.getElementById('fullscreenToggle'),
+        rgb: {
+            red: document.getElementById('redSlider'),
+            green: document.getElementById('greenSlider'),
+            blue: document.getElementById('blueSlider'),
+            redValue: document.getElementById('redValue'),
+            greenValue: document.getElementById('greenValue'),
+            blueValue: document.getElementById('blueValue'),
+            reset: document.getElementById('resetRGB')
         }
     }
-});
+};
 
-// Update checkbox state when fullscreen changes
-document.addEventListener('fullscreenchange', () => {
-    fullscreenToggle.checked = document.fullscreenElement !== null;
-});
-document.addEventListener('webkitfullscreenchange', () => {
-    fullscreenToggle.checked = document.webkitFullscreenElement !== null;
-});
-document.addEventListener('msfullscreenchange', () => {
-    fullscreenToggle.checked = document.msFullscreenElement !== null;
-});
-
-// Drawer scrolling functionality
-let touchStartY = 0;
-let scrollStartY = 0;
-
-drawer.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const scrollSpeed = 1.5;
-    drawer.scrollTop += e.deltaY * scrollSpeed;
-}, { passive: false });
-
-drawer.addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
-    scrollStartY = drawer.scrollTop;
-}, { passive: true });
-
-drawer.addEventListener('touchmove', (e) => {
-    const touchY = e.touches[0].clientY;
-    const diff = touchStartY - touchY;
-    drawer.scrollTop = scrollStartY + diff;
-}, { passive: true });
-
-// Drawer toggle
-drawerToggle.addEventListener('click', () => {
-    drawer.classList.toggle('open');
-});
-
-drawerToggle.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    drawer.classList.toggle('open');
-}, { passive: false });
-
-// RGB Controls collapsible section
-const rgbSection = document.querySelector('.collapsible-section');
-const rgbHeader = rgbSection.querySelector('.collapsible-header');
-const rgbContent = rgbSection.querySelector('.collapsible-content');
-
-rgbHeader.addEventListener('click', () => {
-    const isOpen = rgbSection.classList.toggle('open');
-    if (isOpen) {
-        const contentHeight = rgbContent.scrollHeight;
-        rgbContent.style.height = contentHeight + 'px';
-    } else {
-        rgbContent.style.height = '0';
-    }
-});
-
-// Color management functions
-function getWarmColor(warmth) {
-    const r = baseColor[0];
-    const g = Math.round(baseColor[1] * (0.93 + (warmth * 0.0007)));
-    const b = Math.round(baseColor[2] * (0.84 + (warmth * 0.0016)));
-    return [r, g, b];
-}
-
-function updateRGBValues() {
-    baseColor = [
-        parseInt(redSlider.value),
-        parseInt(greenSlider.value),
-        parseInt(blueSlider.value)
-    ];
-    redValue.textContent = baseColor[0];
-    greenValue.textContent = baseColor[1];
-    blueValue.textContent = baseColor[2];
-    
-    document.querySelectorAll('.shape').forEach(updateShapeColor);
-    updateBackground();
-}
-
-function resetRGB() {
-    redSlider.value = 255;
-    greenSlider.value = 255;
-    blueSlider.value = 255;
-    updateRGBValues();
-}
-
-function updateBackground() {
-    const warmth = warmthSlider.value;
-    const ambient = ambientSlider.value;
-    const warmColor = getWarmColor(warmth);
-    const bgColor = warmColor.map(c => Math.round(c * (ambient / 100)));
-    canvas.style.backgroundColor = `rgb(${bgColor.join(',')})`;
-}
-
-function updateShapeColor(shape) {
-    const warmColor = getWarmColor(warmthSlider.value);
-    shape.style.backgroundColor = `rgb(${warmColor.join(',')})`;
-}
-
-// Shape management functions
-function createBoundingBox(shape) {
-    const box = document.createElement('div');
-    box.className = 'bounding-box';
-    box.dataset.shape = shape.dataset.shape;
-    
-    const handle = document.createElement('div');
-    handle.className = 'resize-handle';
-    box.appendChild(handle);
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-button';
-    deleteBtn.innerHTML = '×';
-    box.appendChild(deleteBtn);
-
-    // Set initial position and size
-    box.style.width = shape.style.width;
-    box.style.height = shape.style.height;
-    box.style.left = shape.style.left;
-    box.style.top = shape.style.top;
-    if (shape.classList.contains('circle')) {
-        box.style.borderRadius = '50%';
-    }
-
-    return box;
-}
-
-function updateBoundingBox(shape) {
-    const box = shape.boundingBox;
-    box.style.width = shape.style.width;
-    box.style.height = shape.style.height;
-    box.style.left = shape.style.left;
-    box.style.top = shape.style.top;
-}
-
-// Event listeners for color controls
-redSlider.addEventListener('input', updateRGBValues);
-greenSlider.addEventListener('input', updateRGBValues);
-blueSlider.addEventListener('input', updateRGBValues);
-resetRGBBtn.addEventListener('click', resetRGB);
-
-// Shape creation and interaction
-document.querySelectorAll('.shape-button').forEach(button => {
-    if (button.id === 'illuminateFullSurface') return;
-    
-    let offset = 0; // Track shape offset
-
-    button.addEventListener('click', createShape);
-    button.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        createShape();
-    }, { passive: false });
-
-    function createShape() {
-        // Get the center of the viewport
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Create shape with larger initial size
-        const shape = document.createElement('div');
-        shape.className = `shape ${button.dataset.shape}`;
-        shape.dataset.shape = button.dataset.shape;
-        const initialSize = 200; // Keep initial size larger than minimum
-        const minSize = 100;  // Define minimum size
-        shape.style.width = `${Math.max(initialSize, minSize)}px`;
-        shape.style.height = `${Math.max(initialSize, minSize)}px`;
-
-        // Position in center with offset
-        shape.style.left = `${(viewportWidth - initialSize) / 2 + offset}px`;
-        shape.style.top = `${(viewportHeight - initialSize) / 2 + offset}px`;
-        
-        // Increment offset for next shape
-        offset = (offset + 20) % 100; // Reset after 5 shapes to prevent too much spread
-
-        updateShapeColor(shape);
-        
-        const boundingBox = createBoundingBox(shape);
-        canvas.appendChild(boundingBox);
-        shape.boundingBox = boundingBox;
-        
-        canvas.appendChild(shape);
-        setupShapeInteraction(shape);
-    }
-});
-
-function setupShapeInteraction(shape) {
-    let isDragging = false;
-    let isResizing = false;
-    let initialRect, startX, startY;
-
-    // Mouse Events
-    shape.addEventListener('mousedown', handleStart);
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseup', handleEnd);
-
-    // Touch Events
-    shape.addEventListener('touchstart', handleStart, { passive: false });
-    document.addEventListener('touchmove', handleMove, { passive: false });
-    document.addEventListener('touchend', handleEnd);
-    document.addEventListener('touchcancel', handleEnd);
-
-    // Handle both mouse and touch start
-    function handleStart(e) {
-        if (isLocked) return;
-
-        // Prevent scrolling while dragging on mobile
-        e.preventDefault();
-        
-        if (selectedShape && selectedShape !== shape) {
-            selectedShape.boundingBox.style.display = 'none';
-        }
-        selectedShape = shape;
-        shape.boundingBox.style.display = 'block';
-
-        const touch = e.touches ? e.touches[0] : e;
-        initialRect = shape.getBoundingClientRect();
-        startX = touch.clientX;
-        startY = touch.clientY;
-        
-        if (!e.target.classList.contains('resize-handle')) {
-            isDragging = true;
+// Platform detection
+const Platform = {
+    isIOS: () => /iPhone|iPad|iPod/i.test(navigator.userAgent),
+    isStandalone: () => window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone,
+    checkIOSFullscreen: () => {
+        if (Platform.isIOS() && !Platform.isStandalone()) {
+            alert("For fullscreen mode on iPhone, add this app to your home screen and open it from there.");
         }
     }
+};
 
-    // Handle both mouse and touch move
-    function handleMove(e) {
-        if (isLocked || (!isDragging && !isResizing)) return;
+// Color management
+const ColorManager = {
+    updateWarmColor: (warmth) => {
+        const r = AppState.baseColor[0];
+        const g = Math.round(AppState.baseColor[1] * (0.93 + (warmth * 0.0007)));
+        const b = Math.round(AppState.baseColor[2] * (0.84 + (warmth * 0.0016)));
+        return [r, g, b];
+    },
 
-        e.preventDefault();
-        const touch = e.touches ? e.touches[0] : e;
+    updateAllColors: () => {
+        const warmth = Elements.controls.warmth.value;
+        const ambient = Elements.controls.ambient.value;
         
-        if (isResizing) {
+        // Update shapes
+        const warmColor = ColorManager.updateWarmColor(warmth);
+        document.querySelectorAll('.shape').forEach(shape => {
+            shape.style.backgroundColor = `rgb(${warmColor.join(',')})`;
+        });
+
+        // Update background
+        const bgColor = warmColor.map(c => Math.round(c * (ambient / 100)));
+        Elements.canvas.style.backgroundColor = `rgb(${bgColor.join(',')})`;
+    },
+
+    checkContrast: (foreground, background) => {
+        // Calculate relative luminance
+        const getLuminance = (r, g, b) => {
+            const [rs, gs, bs] = [r/255, g/255, b/255].map(c => 
+                c <= 0.03928 ? c/12.92 : Math.pow((c + 0.055)/1.055, 2.4)
+            );
+            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+        };
+        
+        const l1 = getLuminance(...foreground);
+        const l2 = getLuminance(...background);
+        
+        const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        return ratio >= 4.5; // WCAG AA standard
+    }
+};
+
+// Bounding box management
+const BoundingBoxManager = {
+    create: (shape) => {
+        const box = document.createElement('div');
+        box.className = `bounding-box ${shape.classList.contains('circle') ? 'circle' : 'square'}`;
+        
+        // Create delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-button';
+        deleteButton.innerHTML = '×';
+        deleteButton.setAttribute('aria-label', 'Delete shape');
+        
+        // Create resize handle
+        const resizeHandle = document.createElement('div');
+        resizeHandle.className = 'resize-handle';
+        
+        // Add controls to box
+        box.appendChild(deleteButton);
+        box.appendChild(resizeHandle);
+        
+        // Position box relative to canvas
+        box.style.position = 'absolute';
+        box.style.width = shape.style.width;
+        box.style.height = shape.style.height;
+        box.style.left = shape.style.left;
+        box.style.top = shape.style.top;
+        
+        Elements.canvas.appendChild(box);
+        shape.boundingBox = box;
+        
+        // Setup event listeners
+        deleteButton.addEventListener('click', () => {
+            shape.remove();
+            box.remove();
+        });
+        
+        BoundingBoxManager.setupResize(shape, resizeHandle);
+        
+        return { box, resizeHandle };
+    },
+
+    setupResize: (shape, handle) => {
+        let startX, startY, startWidth, startHeight;
+
+        const startResize = (e) => {
+            if (AppState.isLocked) return;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const touch = e.touches ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
+            startWidth = parseInt(shape.style.width);
+            startHeight = parseInt(shape.style.height);
+
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+            document.addEventListener('touchmove', resize);
+            document.addEventListener('touchend', stopResize);
+        };
+
+        const resize = (e) => {
+            if (AppState.isLocked) return;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const touch = e.touches ? e.touches[0] : e;
             const dx = touch.clientX - startX;
             const dy = touch.clientY - startY;
 
-            // Allow independent width and height changes for squares
-            if (shape.dataset.shape === 'square') {
-                const minSize = 100; // Increased minimum size for better interaction
-                const newWidth = Math.max(minSize, initialRect.width + dx);
-                const newHeight = Math.max(minSize, initialRect.height + dy);
-                
-                shape.style.width = `${newWidth}px`;
-                shape.style.height = `${newHeight}px`;
-            } else {
-                // Circles maintain aspect ratio
-                const dragDistance = Math.max(dx, dy);
-                const minSize = 100; // Increased minimum size for better interaction
-                const newSize = Math.max(minSize, initialRect.width + dragDistance);
-                
+            if (shape.classList.contains('circle')) {
+                // Keep aspect ratio for circles
+                const newSize = Math.max(startWidth + Math.max(dx, dy), 50);
                 shape.style.width = `${newSize}px`;
                 shape.style.height = `${newSize}px`;
+            } else {
+                // Allow rectangular shapes
+                const newWidth = Math.max(startWidth + dx, 50);
+                const newHeight = Math.max(startHeight + dy, 50);
+                shape.style.width = `${newWidth}px`;
+                shape.style.height = `${newHeight}px`;
+            }
+
+            // Update bounding box size
+            BoundingBoxManager.updatePosition(shape);
+        };
+
+        const stopResize = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+            document.removeEventListener('touchmove', resize);
+            document.removeEventListener('touchend', stopResize);
+            
+            // Ensure shape stays selected
+            AppState.selectedShape = shape;
+            BoundingBoxManager.show(shape);
+        };
+
+        // Add event listeners
+        handle.addEventListener('mousedown', startResize);
+        handle.addEventListener('touchstart', startResize);
+    },
+
+    hideAll: () => {
+        document.querySelectorAll('.bounding-box').forEach(box => {
+            box.style.display = 'none';
+        });
+    },
+
+    show: (shape) => {
+        // Hide all other bounding boxes first
+        BoundingBoxManager.hideAll();
+        
+        // Show this shape's bounding box
+        if (shape.boundingBox) {
+            const box = shape.boundingBox;
+            box.style.display = 'block';
+            box.style.width = shape.style.width;
+            box.style.height = shape.style.height;
+            box.style.left = shape.style.left;
+            box.style.top = shape.style.top;
+        }
+    },
+
+    hide: (shape) => {
+        if (shape.boundingBox) {
+            shape.boundingBox.style.display = 'none';
+        }
+    },
+
+    updatePosition: (shape) => {
+        if (shape.boundingBox) {
+            shape.boundingBox.style.left = shape.style.left;
+            shape.boundingBox.style.top = shape.style.top;
+            shape.boundingBox.style.width = shape.style.width;
+            shape.boundingBox.style.height = shape.style.height;
+        }
+    }
+};
+
+// Shape management
+const ShapeManager = {
+    createShape: (event) => {
+        return safeExecute(() => {
+            if (event.target.id === 'illuminateFullSurface') return;
+            
+            // Deselect previous shape
+            if (AppState.selectedShape) {
+                BoundingBoxManager.hide(AppState.selectedShape);
+            }
+        
+            const shape = document.createElement('div');
+            const shapeType = event.target.dataset.shape;
+            
+            shape.classList.add('shape', shapeType);
+            Object.assign(shape.style, {
+                width: '150px',
+                height: '150px',
+                position: 'absolute',
+                left: `${window.innerWidth / 2 - 75}px`,
+                top: `${window.innerHeight / 2 - 75}px`,
+                backgroundColor: 'white'
+            });
+
+            // Add accessibility attributes
+            shape.setAttribute('role', 'button');
+            shape.setAttribute('tabindex', '0');
+            shape.setAttribute('aria-label', `${shapeType} light source`);
+            shape.setAttribute('aria-grabbed', 'false');
+
+            Elements.canvas.appendChild(shape);
+
+            // Create and show bounding box immediately
+            const { box, resizeHandle } = BoundingBoxManager.create(shape);
+            box.style.display = 'block'; // Ensure box is visible
+            
+            // Set as selected shape
+            AppState.selectedShape = shape;
+            
+            ShapeManager.setupInteraction(shape);
+            ColorManager.updateAllColors();
+            
+            // Focus the new shape for keyboard interaction
+            shape.focus();
+        }, null);
+    },
+
+    setupInteraction: (shape) => {
+        let isDragging = false;
+        let initialX, initialY, startX, startY;
+
+        const handleClick = (e) => {
+            if (AppState.isLocked) return;
+            
+            // Deselect previous shape if different
+            if (AppState.selectedShape && AppState.selectedShape !== shape) {
+                BoundingBoxManager.hide(AppState.selectedShape);
             }
             
-            updateBoundingBox(shape);
-        }
-        else if (isDragging) {
+            // Select this shape
+            AppState.selectedShape = shape;
+            BoundingBoxManager.show(shape);
+            
+            shape.focus();
+            e.stopPropagation();
+        };
+
+        const startDrag = (e) => {
+            if (AppState.isLocked) return;
+            
+            // Select this shape when starting drag
+            handleClick(e);
+            
+            isDragging = true;
+            const touch = e.touches ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
+            initialX = parseInt(shape.style.left);
+            initialY = parseInt(shape.style.top);
+        };
+
+        const drag = (e) => {
+            if (!isDragging || AppState.isLocked) return;
+            
+            const touch = e.touches ? e.touches[0] : e;
             const dx = touch.clientX - startX;
             const dy = touch.clientY - startY;
             
-            shape.style.left = `${initialRect.left + dx}px`;
-            shape.style.top = `${initialRect.top + dy}px`;
-            updateBoundingBox(shape);
-        }
+            shape.style.left = `${initialX + dx}px`;
+            shape.style.top = `${initialY + dy}px`;
+            
+            // Update bounding box position
+            BoundingBoxManager.updatePosition(shape);
+        };
+
+        const stopDrag = () => {
+            isDragging = false;
+        };
+
+        shape.addEventListener('mousedown', startDrag);
+        shape.addEventListener('touchstart', startDrag);
+        shape.addEventListener('click', handleClick);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', stopDrag);
+        document.addEventListener('touchend', stopDrag);
     }
+};
 
-    // Handle both mouse and touch end
-    function handleEnd() {
-        isDragging = false;
-        isResizing = false;
-    }
-
-    // Resize handle events
-    const resizeHandle = shape.boundingBox.querySelector('.resize-handle');
-    resizeHandle.addEventListener('mousedown', handleResizeStart);
-    resizeHandle.addEventListener('touchstart', handleResizeStart, { passive: false });
-
-    function handleResizeStart(e) {
-        if (isLocked) return;
-        
-        e.stopPropagation();
-        e.preventDefault();
-        
-        isResizing = true;
-        const touch = e.touches ? e.touches[0] : e;
-        initialRect = shape.getBoundingClientRect();
-        startX = touch.clientX;
-        startY = touch.clientY;
-    }
-
-    // Delete button events
-    const deleteBtn = shape.boundingBox.querySelector('.delete-button');
-    deleteBtn.addEventListener('mousedown', handleDelete);
-    deleteBtn.addEventListener('touchstart', handleDelete, { passive: false });
-
-    function handleDelete(e) {
-        if (isLocked) return;
-        
-        e.preventDefault();
-        e.stopPropagation();
-        
-        shape.remove();
-        shape.boundingBox.remove();
-        selectedShape = null;
-    }
-}
-
-// Full surface illumination
-illuminateFullSurfaceBtn.addEventListener('click', toggleFullSurface);
-illuminateFullSurfaceBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    toggleFullSurface();
-}, { passive: false });
-
-function toggleFullSurface() {
-    isFullyIlluminated = !isFullyIlluminated;
-    illuminateFullSurfaceBtn.classList.toggle('active', isFullyIlluminated);
-
-    if (isFullyIlluminated) {
-        previousAmbientValue = ambientSlider.value;
-        ambientSlider.value = 100;
-    } else {
-        ambientSlider.value = previousAmbientValue;
-    }
-    updateBackground();
-}
-
-// Canvas lock functionality
-lockCanvasControl.addEventListener('change', (e) => {
-    isLocked = e.target.checked;
-    const shapes = document.querySelectorAll('.shape');
-    
-    shapes.forEach(shape => {
-        if (isLocked) {
-            shape.classList.add('locked');
-            if (shape.boundingBox) {
-                shape.boundingBox.style.display = 'none';
+// Fullscreen management
+const FullscreenManager = {
+    toggle: () => {
+        if (Elements.controls.fullscreen.checked) {
+            if (Platform.isIOS()) {
+                alert("Fullscreen mode is not supported in iOS browsers. Add this app to your home screen.");
+                Elements.controls.fullscreen.checked = false;
+            } else {
+                document.documentElement.requestFullscreen?.() ||
+                document.documentElement.webkitRequestFullscreen?.() ||
+                document.documentElement.msRequestFullscreen?.();
             }
         } else {
-            shape.classList.remove('locked');
+            document.exitFullscreen?.() ||
+            document.webkitExitFullscreen?.() ||
+            document.msExitFullscreen?.();
+        }
+    },
+
+    handleChange: () => {
+        Elements.controls.fullscreen.checked = 
+            document.fullscreenElement !== null ||
+            document.webkitFullscreenElement !== null ||
+            document.msFullscreenElement !== null;
+    }
+};
+
+// RGB Controls
+function setupRGBControls() {
+    const updateRGBValues = () => {
+        AppState.baseColor = [
+            parseInt(Elements.controls.rgb.red.value),
+            parseInt(Elements.controls.rgb.green.value),
+            parseInt(Elements.controls.rgb.blue.value)
+        ];
+        
+        Elements.controls.rgb.redValue.textContent = AppState.baseColor[0];
+        Elements.controls.rgb.greenValue.textContent = AppState.baseColor[1];
+        Elements.controls.rgb.blueValue.textContent = AppState.baseColor[2];
+
+        ColorManager.updateAllColors();
+    };
+
+    // RGB slider listeners
+    Elements.controls.rgb.red.addEventListener('input', updateRGBValues);
+    Elements.controls.rgb.green.addEventListener('input', updateRGBValues);
+    Elements.controls.rgb.blue.addEventListener('input', updateRGBValues);
+
+    // Reset RGB button
+    Elements.controls.rgb.reset.addEventListener('click', () => {
+        Elements.controls.rgb.red.value = 255;
+        Elements.controls.rgb.green.value = 255;
+        Elements.controls.rgb.blue.value = 255;
+        updateRGBValues();
+    });
+
+    // RGB Section collapsible
+    const rgbSection = document.querySelector('.collapsible-section');
+    const rgbHeader = rgbSection.querySelector('.collapsible-header');
+    const rgbContent = rgbSection.querySelector('.collapsible-content');
+
+    rgbHeader.addEventListener('click', () => {
+        const isOpen = rgbSection.classList.toggle('open');
+        rgbContent.style.height = isOpen ? rgbContent.scrollHeight + 'px' : '0';
+    });
+}
+
+// Add helper function for screen reader announcements
+function announceToScreenReader(message) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('role', 'status');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.classList.add('sr-only');
+    announcement.textContent = message;
+    document.body.appendChild(announcement);
+    setTimeout(() => announcement.remove(), 1000);
+}
+
+// Add error handling wrapper
+function safeExecute(operation, fallback = null) {
+    try {
+        return operation();
+    } catch (error) {
+        console.error(`Operation failed: ${error.message}`);
+        return fallback;
+    }
+}
+
+// Add input validation
+function validateNumericInput(value, min, max, defaultValue) {
+    const num = parseFloat(value);
+    if (isNaN(num) || num < min || num > max) {
+        console.warn(`Invalid value: ${value}. Using default: ${defaultValue}`);
+        return defaultValue;
+    }
+    return num;
+}
+
+// Add utility functions
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Event listeners setup
+function setupEventListeners() {
+    // Drawer toggle
+    const handleDrawerToggle = () => {
+        Elements.drawer.classList.toggle('open');
+        // Hide all shape controls when drawer opens
+        document.querySelectorAll('.shape').forEach(shape => 
+            BoundingBoxManager.hide(shape));
+    };
+
+    Elements.drawerToggle.addEventListener('click', handleDrawerToggle);
+    Elements.drawerToggle.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleDrawerToggle();
+    }, { passive: false });
+
+    // Shape creation
+    document.querySelectorAll('.shape-button').forEach(button => 
+        button.addEventListener('click', ShapeManager.createShape));
+
+    // Controls
+    Elements.controls.warmth.addEventListener('input', ColorManager.updateAllColors);
+    Elements.controls.ambient.addEventListener('input', ColorManager.updateAllColors);
+    Elements.controls.lockCanvas.addEventListener('change', (e) => {
+        AppState.isLocked = e.target.checked;
+        document.querySelectorAll('.shape').forEach(shape => {
+            shape.classList.toggle('locked', AppState.isLocked);
+            if (AppState.isLocked) {
+                BoundingBoxManager.hide(shape);
+            }
+        });
+    });
+
+    // Fullscreen
+    Elements.controls.fullscreen.addEventListener('change', FullscreenManager.toggle);
+    document.addEventListener('fullscreenchange', FullscreenManager.handleChange);
+    document.addEventListener('webkitfullscreenchange', FullscreenManager.handleChange);
+    document.addEventListener('msfullscreenchange', FullscreenManager.handleChange);
+
+    // Full surface illumination
+    Elements.controls.fullSurface.addEventListener('click', () => {
+        AppState.isFullyIlluminated = !AppState.isFullyIlluminated;
+        Elements.controls.fullSurface.classList.toggle('active', AppState.isFullyIlluminated);
+
+        if (AppState.isFullyIlluminated) {
+            AppState.previousAmbientValue = Elements.controls.ambient.value;
+            Elements.controls.ambient.value = 100;
+        } else {
+            Elements.controls.ambient.value = AppState.previousAmbientValue;
+        }
+        ColorManager.updateAllColors();
+    });
+
+    // Close controls when clicking outside shapes
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.shape') && !e.target.closest('.drawer')) {
+            document.querySelectorAll('.shape').forEach(shape => 
+                BoundingBoxManager.hide(shape));
         }
     });
 
-    if (isLocked && selectedShape) {
-        selectedShape.boundingBox.style.display = 'none';
-        selectedShape = null;
-    }
-});
-
-// Light control listeners
-warmthSlider.addEventListener('input', () => {
-    document.querySelectorAll('.shape').forEach(updateShapeColor);
-    updateBackground();
-});
-
-ambientSlider.addEventListener('input', updateBackground);
-
-// Canvas click handler
-canvas.addEventListener('click', handleCanvasClick);
-canvas.addEventListener('touchstart', handleCanvasClick);
-
-function handleCanvasClick(e) {
-    if (e.target === canvas && selectedShape) {
-        selectedShape.boundingBox.style.display = 'none';
-        selectedShape = null;
-    }
+    // Add canvas click handler to deselect shapes when clicking empty space
+    Elements.canvas.addEventListener('mousedown', (event) => {
+        if (event.target === Elements.canvas) {
+            // Hide all bounding boxes when clicking canvas
+            document.querySelectorAll('.bounding-box').forEach(box => {
+                box.style.display = 'none';
+            });
+            AppState.selectedShape = null;
+        }
+    });
 }
+
+// Initialize application
+function initializeApp() {
+    Platform.checkIOSFullscreen();
+    setupEventListeners();
+    setupRGBControls();
+    ColorManager.updateAllColors();
+}
+
+// Start the application
+document.addEventListener('DOMContentLoaded', initializeApp);

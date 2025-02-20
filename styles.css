@@ -1,3 +1,44 @@
+/* Normalize appearance across browsers */
+button,
+input,
+select,
+textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+/* Remove default focus styles */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+}
+
+/* CSS Variables for consistent theming */
+:root {
+    --color-background: rgb(34, 33, 31);
+    --color-text: rgb(245, 242, 236);
+    --color-text-muted: rgba(245, 242, 236, 0.7);
+    --color-accent: rgb(196, 181, 153);
+    --color-border: rgba(214, 211, 205, 0.2);
+    --color-button-bg: rgba(61, 59, 54, 0.5);
+    --color-button-hover: rgba(99, 95, 89, 0.6);
+    --transition-standard: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --drawer-width: 280px;
+    --border-radius-standard: 8px;
+}
+
+/* Base reset and global styles */
 * { 
     margin: 0; 
     padding: 0; 
@@ -8,20 +49,22 @@ body {
     height: 100vh; 
     overflow: hidden; 
     touch-action: none; 
-    background: black; 
+    background: black;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* Drawer styles */
 .drawer {
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
-    width: 280px;
-    background: rgb(34, 33, 31);
-    transform: translateX(-280px);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: var(--drawer-width);
+    background: var(--color-background);
+    transform: translateX(calc(-1 * var(--drawer-width)));
+    transition: var(--transition-standard);
     z-index: 1000;
-    color: rgb(245, 242, 236);
+    color: var(--color-text);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -35,10 +78,10 @@ body {
     top: 16px;
     background: rgb(44, 42, 39);
     border: none;
-    color: rgb(245, 242, 236);
+    color: var(--color-text);
     padding: 12px;
     cursor: pointer;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 var(--border-radius-standard) var(--border-radius-standard) 0;
     width: 48px;
     height: 48px;
     display: flex;
@@ -52,12 +95,11 @@ body {
     height: 100vh;
     padding: 24px;
     overflow-y: auto;
-    color: rgb(245, 242, 236);
-    position: relative;
     scroll-behavior: smooth;
     overscroll-behavior: contain;
 }
 
+/* App header styles */
 .app-header {
     display: flex;
     align-items: center;
@@ -75,12 +117,168 @@ body {
 
 .app-header h2 {
     margin: 0;
-    font-size: 24px;
-    font-weight: 600;
-    color: rgb(245, 242, 236);
+    font-size: 19px;
+    font-weight: 500;
     letter-spacing: 0.5px;
 }
 
+/* Shape and canvas styles */
+#canvas { 
+    width: 100vw; 
+    height: 100vh; 
+    background: black; 
+    position: relative; 
+}
+
+.shape {
+    position: absolute;
+    cursor: move;
+    touch-action: none;
+    background: rgb(174, 82, 82);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+    transform: translate3d(0, 0, 0);
+}
+
+.shape.circle { 
+    border-radius: 50%; 
+}
+
+.shape.square {
+    border-radius: 12px;
+}
+
+.shape.locked { 
+    cursor: default !important; 
+    pointer-events: none; 
+}
+
+/* Bounding box styles */
+.bounding-box {
+    position: absolute;
+    border: 5px solid rgba(196, 181, 153, 0.95);
+    box-shadow: 0 0 8px rgba(196, 181, 153, 0.6);
+    pointer-events: none;
+    display: none;
+    box-sizing: border-box;
+    z-index: 999;
+}
+
+/* Add a subtle animation to make it more noticeable */
+.bounding-box {
+    animation: boundingBoxGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced glow animation */
+@keyframes boundingBoxGlow {
+    0% { 
+        box-shadow: 0 0 8px rgba(196, 181, 153, 0.6);
+        border-color: rgba(196, 181, 153, 0.95);
+    }
+    50% { 
+        box-shadow: 0 0 12px rgba(196, 181, 153, 0.7);
+        border-color: rgba(196, 181, 153, 1);
+    }
+    100% { 
+        box-shadow: 0 0 8px rgba(196, 181, 153, 0.6);
+        border-color: rgba(196, 181, 153, 0.95);
+    }
+}
+
+/* Maintain shape-specific styles */
+.bounding-box.circle { 
+    border-radius: 50%; 
+}
+
+.bounding-box.square {
+    border-radius: 12px;
+}
+
+/* Ensure shape focus is visible */
+.shape:focus {
+    outline: none; /* Remove default focus outline */
+    /* The bounding box will serve as the focus indicator */
+}
+
+/* Update shape focus and active states */
+.shape:focus,
+.shape.selected {
+    outline: none;
+    z-index: 1;
+}
+
+/* Control elements */
+.control-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(214, 211, 205, 0.1);
+}
+
+.control-section label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+/* Checkbox styles */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px;
+    background: var(--color-button-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-standard);
+    transition: var(--transition-standard);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.checkbox-label:hover {
+    background: var(--color-button-hover);
+    border-color: rgba(214, 211, 205, 0.4);
+}
+
+.checkbox-label input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--color-accent);
+    border-radius: 3px;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition-standard);
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+    background-color: var(--color-accent);
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: var(--color-background);
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.checkbox-description {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin-top: 8px;
+    margin-left: 12px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+/* Shape buttons */
 .shape-buttons-container {
     display: flex;
     flex-direction: column;
@@ -91,21 +289,25 @@ body {
 .shape-button {
     width: 100%;
     padding: 14px 16px;
-    background: rgba(61, 59, 54, 0.5);
-    border: 1px solid rgba(214, 211, 205, 0.2);
-    color: rgb(245, 242, 236);
+    background: var(--color-button-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--border-radius-standard);
     display: flex;
     align-items: center;
     gap: 14px;
-    transition: all 0.2s;
+    transition: var(--transition-standard);
     font-size: 15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
 }
 
 .shape-button:hover {
-    background: rgba(99, 95, 89, 0.6);
+    background: var(--color-button-hover);
     border-color: rgba(214, 211, 205, 0.4);
     transform: translateY(-1px);
 }
@@ -121,54 +323,59 @@ body {
     height: 18px;
 }
 
-.control-section {
-    margin-top: 28px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(214, 211, 205, 0.1);
-}
-
-.control-section label {
-    display: block;
-    font-size: 14px;
-    color: rgb(245, 242, 236);
-    margin-bottom: 12px;
-}
-
-.checkbox-label {
+/* Delete and resize controls */
+.delete-button {
+    position: absolute;
+    top: -25px;
+    right: -25px;
+    background: #ff4444;
+    border: none;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    cursor: pointer;
-    padding: 12px;
-    background: rgba(82, 79, 73, 0.5);
-    border: 1px solid rgba(214, 211, 205, 0.2);
-    border-radius: 8px;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
+    justify-content: center;
+    pointer-events: auto;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0;
+    z-index: 1000;
+    transition: background-color 0.2s;
 }
 
-.checkbox-label:hover {
-    background: rgba(99, 95, 89, 0.6);
-    border-color: rgba(214, 211, 205, 0.4);
+.delete-button:hover { 
+    background: #cc3333; 
 }
 
-.checkbox-label input[type="checkbox"] {
-    margin-right: 12px;
-    width: 16px;
-    height: 16px;
-    accent-color: rgb(196, 181, 153);
+/* Resize handle */
+.resize-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: var(--color-accent);
+    border: 2px solid var(--color-text);
+    pointer-events: auto;
+    z-index: 1000;
+    cursor: se-resize;
+    bottom: -10px;
+    right: -10px;
+    border-radius: 50%;
+    touch-action: none;
+    transition: transform 0.2s;
 }
 
-.checkbox-description {
-    font-size: 13px;
-    color: rgba(245, 242, 236, 0.7);
-    margin-top: 8px;
-    margin-left: 12px;
-    margin-bottom: 16px;
-    line-height: 1.4;
+.resize-handle:hover {
+    transform: scale(1.1);
+    background: rgba(196, 181, 153, 0.9);
 }
 
+/* Slider styles */
 input[type="range"] {
     -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
     width: 100%;
     height: 36px;
@@ -180,7 +387,7 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-runnable-track {
     height: 8px;
-    background: rgba(82, 79, 73, 0.5);
+    background: var(--color-button-bg);
     border-radius: 4px;
 }
 
@@ -189,10 +396,9 @@ input[type="range"]::-webkit-slider-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: rgb(196, 181, 153);
-    border: 2px solid rgb(245, 242, 236);
+    background: var(--color-accent);
+    border: 2px solid var(--color-text);
     margin-top: -8px;
-    cursor: pointer;
     transition: transform 0.2s;
 }
 
@@ -200,6 +406,76 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.1);
 }
 
+/* Update the slider thumb styles for each RGB slider */
+input[type="range"]#redSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: rgb(141, 32, 32);
+    border: 2px solid var(--color-text);
+    margin-top: -8px;
+    transition: transform 0.2s;
+}
+
+input[type="range"]#greenSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: rgb(36, 116, 36);
+    border: 2px solid var(--color-text);
+    margin-top: -8px;
+    transition: transform 0.2s;
+}
+
+input[type="range"]#blueSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: rgb(37, 37, 132);
+    border: 2px solid var(--color-text);
+    margin-top: -8px;
+    transition: transform 0.2s;
+}
+
+/* Add hover effect for all RGB sliders */
+input[type="range"]#redSlider::-webkit-slider-thumb:hover,
+input[type="range"]#greenSlider::-webkit-slider-thumb:hover,
+input[type="range"]#blueSlider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Add support for Firefox */
+input[type="range"]#redSlider::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: rgb(255, 0, 0);
+    border: 2px solid var(--color-text);
+    transition: transform 0.2s;
+}
+
+input[type="range"]#greenSlider::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: rgb(0, 255, 0);
+    border: 2px solid var(--color-text);
+    transition: transform 0.2s;
+}
+
+input[type="range"]#blueSlider::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: rgb(0, 0, 255);
+    border: 2px solid var(--color-text);
+    transition: transform 0.2s;
+}
+
+/* RGB Controls section */
 .collapsible-section {
     margin-top: auto;
     border-top: 1px solid rgba(214, 211, 205, 0.1);
@@ -210,7 +486,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     padding: 16px 0;
     background: none;
     border: none;
-    color: rgb(245, 242, 236);
+    color: var(--color-text);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -247,30 +523,30 @@ input[type="range"]::-webkit-slider-thumb:hover {
     justify-content: space-between;
     margin-bottom: 8px;
     font-size: 12px;
-    color: rgba(245, 242, 236, 0.7);
+    color: var(--color-text-muted);
 }
 
 .reset-button {
     width: 100%;
     padding: 10px;
-    background: rgba(82, 79, 73, 0.5);
-    border: 1px solid rgba(214, 211, 205, 0.2);
-    color: rgb(245, 242, 236);
+    background: var(--color-button-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
     margin-bottom: 20px;
-    transition: all 0.2s;
+    transition: var(--transition-standard);
     -webkit-tap-highlight-color: transparent;
 }
 
 .reset-button:hover {
-    background: rgba(99, 95, 89, 0.6);
+    background: var(--color-button-hover);
     border-color: rgba(214, 211, 205, 0.4);
     transform: translateY(-1px);
 }
 
-/* Custom scrollbar styling */
+/* Scrollbar styling */
 .drawer-inner::-webkit-scrollbar {
     width: 6px;
 }
@@ -288,120 +564,44 @@ input[type="range"]::-webkit-slider-thumb:hover {
     background: rgba(196, 181, 153, 0.5);
 }
 
-/* Shape styles */
-.shape {
-    position: absolute;
-    cursor: move;
-    touch-action: none;
-    transition: all 0.2s;
-    background: white;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.shape.circle { 
-    border-radius: 50%; 
-}
-
-.shape[data-shape="square"] {
-    border-radius: 12px;
-}
-
-.shape.locked { 
-    cursor: default !important; 
-    pointer-events: none; 
-}
-
-.bounding-box {
-    position: absolute;
-    border: 2px solid rgb(196, 181, 153);
-    pointer-events: none;
-    display: none;
-}
-
-.bounding-box.circle { 
-    border-radius: 50%; 
-}
-
-.bounding-box[data-shape="square"] {
-    border-radius: 12px;
-}
-
-.resize-handle {
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    background: white;
-    border: 2px solid rgb(196, 181, 153);
-    pointer-events: auto;
-    z-index: 1000;
-    cursor: se-resize;
-    bottom: -16px;
-    right: -16px;
-    border-radius: 50%;
-    touch-action: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.delete-button {
-    position: absolute;
-    top: -40px;
-    right: -40px;
-    background: #ff4444;
-    border: none;
-    color: white;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: auto;
-    font-size: 24px;
-    touch-action: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.delete-button:hover { 
-    background: #cc3333; 
-}
-
-#canvas { 
-    width: 100vw; 
-    height: 100vh; 
-    background: black; 
-    position: relative; 
-}
-
-/* User selection prevention */
-.shape, .delete-button, .resize-handle, .drawer-toggle {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-/* Touch-specific optimizations */
+/* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
     .shape-button,
-    .checkbox-label,
-    .reset-button {
-        padding: 16px;  /* Larger touch targets */
+    .checkbox-label {
+        padding: 16px;
     }
 
     .drawer-toggle {
-        width: 56px;    /* Larger menu button */
+        width: 56px;
         height: 56px;
         right: -56px;
     }
 
     input[type="range"]::-webkit-slider-thumb {
-        width: 28px;    /* Larger slider handle */
+        width: 28px;
         height: 28px;
+    }
+
+    input[type="range"]#redSlider::-webkit-slider-thumb,
+    input[type="range"]#greenSlider::-webkit-slider-thumb,
+    input[type="range"]#blueSlider::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
+    }
+    
+    input[type="range"]#redSlider::-moz-range-thumb,
+    input[type="range"]#greenSlider::-moz-range-thumb,
+    input[type="range"]#blueSlider::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+    }
+
+    .bounding-box {
+        border-width: 6px; /* Slightly thicker for touch devices */
     }
 }
 
-/* Reduced motion support */
+/* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;

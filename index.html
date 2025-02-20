@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowFrame - Light Box</title>
+    <title>VisionGlowFrames - Light Box</title>
     <link rel="stylesheet" href="./styles.css">
     <link rel="icon" type="image/png" href="glowframeicon.png">
+    
+    <!-- Enable PWA full screen on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 </head>
 <body>
     <div class="drawer" role="complementary" aria-label="Controls">
@@ -13,7 +17,7 @@
         <div id="drawer-content" class="drawer-inner">
             <div class="app-header">
                 <img src="glowframeicon.png" alt="GlowFrame" class="app-logo">
-                <h2>GlowFrame</h2>
+                <h2>VisionGlowFrames</h2>
             </div>
 
             <div class="shape-buttons-container">
@@ -69,39 +73,35 @@
                 </div>
             </div>
 
-            <div class="control-section collapsible-section">
+            <div class="collapsible-section">
                 <button class="collapsible-header">
-                    <span>RGB Fine Tuning</span>
-                    <svg class="arrow-icon" width="12" height="12" viewBox="0 0 12 12">
-                        <path d="M2 4L6 8L10 4" fill="none" stroke="currentColor" stroke-width="2"/>
-                    </svg>
+                    RGB Controls
+                    <span class="arrow-icon">▼</span>
                 </button>
                 <div class="collapsible-content">
                     <div class="rgb-controls">
-                        <button id="resetRGB" class="reset-button">
-                            Reset to White
-                        </button>
                         <div class="slider-group">
                             <div class="slider-header">
-                                <label for="redSlider">Red</label>
+                                <span>Red</span>
                                 <span id="redValue">255</span>
                             </div>
-                            <input type="range" id="redSlider" min="40" max="255" value="255">
+                            <input type="range" id="redSlider" min="0" max="255" value="255">
                         </div>
                         <div class="slider-group">
                             <div class="slider-header">
-                                <label for="greenSlider">Green</label>
+                                <span>Green</span>
                                 <span id="greenValue">255</span>
                             </div>
-                            <input type="range" id="greenSlider" min="40" max="255" value="255">
+                            <input type="range" id="greenSlider" min="0" max="255" value="255">
                         </div>
                         <div class="slider-group">
                             <div class="slider-header">
-                                <label for="blueSlider">Blue</label>
+                                <span>Blue</span>
                                 <span id="blueValue">255</span>
                             </div>
-                            <input type="range" id="blueSlider" min="40" max="255" value="255">
+                            <input type="range" id="blueSlider" min="0" max="255" value="255">
                         </div>
+                        <button id="resetRGB" class="reset-button">Reset to White</button>
                     </div>
                 </div>
             </div>
