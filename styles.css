@@ -24,9 +24,64 @@ textarea:focus {
     outline: none;
 }
 
-/* CSS Variables for consistent theming */
+/*
+ * Light Box App Styles
+ * Version: 1.0.0
+ * Structure:
+ * 1. CSS Custom Properties
+ * 2. Base & Reset
+ * 3. Layout
+ * 4. Components
+ * 5. Utilities
+ * 6. Animations
+ * 7. Media Queries
+ */
+
+/* 1. CSS Custom Properties - Enhanced with more options */
 :root {
+    /* Colors */
     --color-background: rgb(34, 33, 31);
+    --color-background-darker: rgb(28, 27, 25);
+    --color-background-lighter: rgb(44, 42, 39);
+    
+    /* Text Colors */
+    --color-text-primary: rgb(245, 242, 236);
+    --color-text-secondary: rgba(245, 242, 236, 0.7);
+    --color-text-disabled: rgba(245, 242, 236, 0.4);
+    
+    /* Accent Colors */
+    --color-accent-primary: rgb(196, 181, 153);
+    --color-accent-secondary: rgba(196, 181, 153, 0.7);
+    --color-accent-hover: rgba(196, 181, 153, 0.85);
+    
+    /* UI Colors */
+    --color-success: #4CAF50;
+    --color-error: #ff4444;
+    --color-warning: #FFC107;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+
     --color-text: rgb(245, 242, 236);
     --color-text-muted: rgba(245, 242, 236, 0.7);
     --color-accent: rgb(196, 181, 153);
@@ -36,6 +91,7 @@ textarea:focus {
     --transition-standard: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --drawer-width: 280px;
     --border-radius-standard: 8px;
+    --glow-intensity: 0;
 }
 
 /* Base reset and global styles */
@@ -69,6 +125,9 @@ body {
     color: var(--color-text);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     padding-top: env(safe-area-inset-top);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
 }
 
 .drawer.open { 
@@ -137,12 +196,23 @@ body {
     position: absolute;
     cursor: move;
     touch-action: none;
-    background: rgb(174, 82, 82);
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
     box-sizing: border-box;
     transform: translate3d(0, 0, 0);
+    will-change: transform;
+    transform-origin: center center;
+    
+    /* Base glow effect */
+    box-shadow: 0 0 10px rgba(var(--shape-color), calc(0.95 * var(--glow-intensity))),
+                0 0 20px rgba(var(--shape-color), calc(0.75 * var(--glow-intensity))),
+                0 0 40px rgba(var(--shape-color), calc(0.45 * var(--glow-intensity))),
+                0 0 80px rgba(var(--shape-color), calc(0.25 * var(--glow-intensity)));
+    filter: drop-shadow(0 0 8px rgba(var(--shape-color), calc(0.85 * var(--glow-intensity))));
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    background-color: white;
 }
 
 .shape.circle { 
@@ -167,6 +237,8 @@ body {
     display: none;
     box-sizing: border-box;
     z-index: 999;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 /* Add a subtle animation to make it more noticeable */
@@ -177,16 +249,16 @@ body {
 /* Enhanced glow animation */
 @keyframes boundingBoxGlow {
     0% { 
-        box-shadow: 0 0 8px rgba(196, 181, 153, 0.6);
-        border-color: rgba(196, 181, 153, 0.95);
+        box-shadow: 0 0 8px var(--color-accent-secondary);
+        border-color: var(--color-accent-primary);
     }
     50% { 
-        box-shadow: 0 0 12px rgba(196, 181, 153, 0.7);
-        border-color: rgba(196, 181, 153, 1);
+        box-shadow: 0 0 12px var(--color-accent-hover);
+        border-color: var(--color-accent-hover);
     }
     100% { 
-        box-shadow: 0 0 8px rgba(196, 181, 153, 0.6);
-        border-color: rgba(196, 181, 153, 0.95);
+        box-shadow: 0 0 8px var(--color-accent-secondary);
+        border-color: var(--color-accent-primary);
     }
 }
 
@@ -203,6 +275,9 @@ body {
 .shape:focus {
     outline: none; /* Remove default focus outline */
     /* The bounding box will serve as the focus indicator */
+    box-shadow: 0 0 20px rgba(var(--shape-color, 255, 255, 255), 0.3),
+                0 0 40px rgba(var(--shape-color, 255, 255, 255), 0.15),
+                0 0 60px rgba(var(--shape-color, 255, 255, 255), 0.1);
 }
 
 /* Update shape focus and active states */
@@ -210,6 +285,18 @@ body {
 .shape.selected {
     outline: none;
     z-index: 1;
+    box-shadow: 0 0 20px rgba(var(--shape-color, 255, 255, 255), 0.3),
+                0 0 40px rgba(var(--shape-color, 255, 255, 255), 0.15),
+                0 0 60px rgba(var(--shape-color, 255, 255, 255), 0.1);
+}
+
+/* Enhanced glow effect when shape is selected */
+.shape.selected {
+    box-shadow: 0 0 15px rgba(var(--shape-color), calc(0.95 * var(--glow-intensity))),
+                0 0 30px rgba(var(--shape-color), calc(0.75 * var(--glow-intensity))),
+                0 0 60px rgba(var(--shape-color), calc(0.45 * var(--glow-intensity))),
+                0 0 100px rgba(var(--shape-color), calc(0.25 * var(--glow-intensity)));
+    filter: drop-shadow(0 0 12px rgba(var(--shape-color), calc(0.85 * var(--glow-intensity))));
 }
 
 /* Control elements */
@@ -307,6 +394,11 @@ body {
     appearance: none;
     -webkit-tap-highlight-color: transparent;
     font-family: inherit;
+    background: linear-gradient(
+        to bottom,
+        var(--color-button-bg),
+        var(--color-background-darker)
+    );
 }
 
 .shape-button:hover {
@@ -394,6 +486,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     border-radius: 4px;
 }
 
+/* Standard slider thumbs */
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 24px;
@@ -405,17 +498,22 @@ input[type="range"]::-webkit-slider-thumb {
     transition: transform 0.2s;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
+input[type="range"]::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 2px solid var(--color-text);
+    transition: transform 0.2s;
 }
 
-/* Update the slider thumb styles for each RGB slider */
+/* Update RGB slider thumbs with specific colors */
 input[type="range"]#redSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: rgb(141, 32, 32);
+    background: rgb(255, 0, 0);
     border: 2px solid var(--color-text);
     margin-top: -8px;
     transition: transform 0.2s;
@@ -426,7 +524,7 @@ input[type="range"]#greenSlider::-webkit-slider-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: rgb(36, 116, 36);
+    background: rgb(0, 255, 0);
     border: 2px solid var(--color-text);
     margin-top: -8px;
     transition: transform 0.2s;
@@ -437,7 +535,7 @@ input[type="range"]#blueSlider::-webkit-slider-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: rgb(37, 37, 132);
+    background: rgb(0, 0, 255);
     border: 2px solid var(--color-text);
     margin-top: -8px;
     transition: transform 0.2s;
@@ -476,6 +574,28 @@ input[type="range"]#blueSlider::-moz-range-thumb {
     background: rgb(0, 0, 255);
     border: 2px solid var(--color-text);
     transition: transform 0.2s;
+}
+
+/* Add styles for disabled slider */
+input[type="range"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+    background: #666;
+    cursor: not-allowed;
+}
+
+input[type="range"]:disabled::-moz-range-thumb {
+    background: #666;
+    cursor: not-allowed;
+}
+
+/* Add styles for disabled label */
+label[for="glowSlider"].disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* RGB Controls section */
@@ -618,6 +738,20 @@ input[type="range"]#blueSlider::-moz-range-thumb {
         right: -30px;
         font-size: 24px;
     }
+
+    .shape-button:active {
+        transform: scale(0.98);
+        transition: transform var(--transition-fast);
+    }
+    
+    .delete-button {
+        -webkit-tap-highlight-color: transparent;
+        transition: transform var(--transition-fast);
+    }
+    
+    .delete-button:active {
+        transform: scale(0.95);
+    }
 }
 
 /* Reduced motion preferences */
@@ -628,4 +762,24 @@ input[type="range"]#blueSlider::-moz-range-thumb {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* Add or update the settings-controls class */
+.settings-controls .checkbox-label {
+    margin-bottom: 16px;  /* Adds space between checkboxes */
+}
+
+.settings-controls .checkbox-label:last-child {
+    margin-bottom: 0;     /* Removes margin from last checkbox */
+}
+
+.settings-section {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.settings-section .settings-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }

@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, viewport-fit=cover">
     <title>VisionGlowFrames - Light Box</title>
     <link rel="stylesheet" href="./styles.css">
     <link rel="icon" type="image/png" href="glowframeicon.png">
+    
+    <!-- Add these lines near the top of your head section -->
+    <link rel="preconnect" href="/fonts">
+    <link rel="preload" href="critical.css" as="style">
     
     <!-- iOS specific meta tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -57,25 +61,24 @@
                     <label for="warmth">Light Warmth</label>
                     <input type="range" id="warmth" min="0" max="100" value="0">
                 </div>
-            </div>
 
-            <div class="control-section">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="fullscreenToggle">
-                    <span>Full Screen</span>
-                </label>
-                <div class="checkbox-description">
-                    Toggles full screen mode for the application
+                <div style="margin-top: 24px;">
+                    <label for="glowSlider">Shape Glow</label>
+                    <input type="range" id="glowSlider" min="0" max="100" value="0">
                 </div>
             </div>
 
-            <div class="control-section">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="canvasLock">
-                    <span>Lock Canvas</span>
-                </label>
-                <div class="checkbox-description">
-                    Prevents shapes from being moved or adjusted
+            <div class="settings-section">
+                <div class="settings-controls">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="fullscreenToggle">
+                        <span>Full Screen</span>
+                    </label>
+                    
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="canvasLock">
+                        <span>Lock Shapes</span>
+                    </label>
                 </div>
             </div>
 

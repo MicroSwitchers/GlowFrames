@@ -9,6 +9,19 @@ const AppState = {
     focusedShape: null
 };
 
+// Add this utility function at the top of your script.js file
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 // DOM Elements management
 const Elements = {
     drawer: document.querySelector('.drawer'),
@@ -28,15 +41,16 @@ const Elements = {
             greenValue: document.getElementById('greenValue'),
             blueValue: document.getElementById('blueValue'),
             reset: document.getElementById('resetRGB')
-        }
-    }
+        },
+        glowSlider: document.getElementById('glowSlider'),
+        glowValue: document.getElementById('glowValue')
+    },
+    shapes: document.getElementsByClassName('shape')  // Use getElementsByClassName instead of querySelectorAll
 };
 
 // Platform detection
 const Platform = {
     isIOS: () => /iPhone|iPad|iPod/i.test(navigator.userAgent),
-    isStandalone: () => window.matchMedia('(display-mode: standalone)').matches || 
-                       window.navigator.standalone,
     checkIOSFullscreen: () => {
         if (Platform.isIOS() && !Platform.isStandalone()) {
             alert("For fullscreen mode on iPhone, add this app to your home screen and open it from there.");
@@ -57,10 +71,21 @@ const ColorManager = {
         const warmth = Elements.controls.warmth.value;
         const ambient = Elements.controls.ambient.value;
         
-        // Update shapes
-        const warmColor = ColorManager.updateWarmColor(warmth);
+        // Get base RGB color
+        const baseRGB = [
+            parseInt(Elements.controls.rgb.red.value),
+            parseInt(Elements.controls.rgb.green.value),
+            parseInt(Elements.controls.rgb.blue.value)
+        ];
+        
+        // Apply warmth to the base color
+        const warmColor = ColorManager.updateWarmColor(warmth, baseRGB);
+
+        // Update shapes with color and CSS variable for glow
         document.querySelectorAll('.shape').forEach(shape => {
             shape.style.backgroundColor = `rgb(${warmColor.join(',')})`;
+            // Set CSS variable for glow color
+            shape.style.setProperty('--shape-color', warmColor.join(','));
         });
 
         // Update background
@@ -119,6 +144,7 @@ const BoundingBoxManager = {
         deleteButton.addEventListener('click', () => {
             shape.remove();
             box.remove();
+            updateGlowSliderState();
         });
         
         BoundingBoxManager.setupResize(shape, resizeHandle);
@@ -272,6 +298,7 @@ const ShapeManager = {
             
             // Focus the new shape for keyboard interaction
             shape.focus();
+            updateGlowSliderState();
         }, null);
     },
 
@@ -377,7 +404,7 @@ function setupRGBControls() {
         Elements.controls.rgb.greenValue.textContent = AppState.baseColor[1];
         Elements.controls.rgb.blueValue.textContent = AppState.baseColor[2];
 
-        ColorManager.updateAllColors();
+        debouncedColorUpdate();
     };
 
     // RGB slider listeners
@@ -402,6 +429,13 @@ function setupRGBControls() {
         const isOpen = rgbSection.classList.toggle('open');
         rgbContent.style.height = isOpen ? rgbContent.scrollHeight + 'px' : '0';
     });
+}
+
+// Add glow control function
+function updateGlowIntensity() {
+    const rawValue = Elements.controls.glowSlider.value;
+    const intensity = rawValue / 100;
+    document.documentElement.style.setProperty('--glow-intensity', intensity);
 }
 
 // Add helper function for screen reader announcements
@@ -448,6 +482,26 @@ function debounce(func, wait) {
     };
 }
 
+// Add debouncing for intensive operations
+const debouncedColorUpdate = debounce(ColorManager.updateAllColors, 16);
+
+// Add cleanup function for shape removal
+function removeShape(shape) {
+    // Remove event listeners
+    shape.removeEventListener('mousedown', handleMouseDown);
+    shape.removeEventListener('touchstart', handleTouchStart);
+    // Remove the shape
+    shape.remove();
+    updateGlowSliderState();
+}
+
+// Use DocumentFragment for multiple DOM insertions
+function addMultipleShapes(shapes) {
+    const fragment = document.createDocumentFragment();
+    shapes.forEach(shape => fragment.appendChild(shape));
+    Elements.canvas.appendChild(fragment);
+}
+
 // Event listeners setup
 function setupEventListeners() {
     // Drawer toggle
@@ -469,8 +523,8 @@ function setupEventListeners() {
         button.addEventListener('click', ShapeManager.createShape));
 
     // Controls
-    Elements.controls.warmth.addEventListener('input', ColorManager.updateAllColors);
-    Elements.controls.ambient.addEventListener('input', ColorManager.updateAllColors);
+    Elements.controls.warmth.addEventListener('input', debouncedColorUpdate);
+    Elements.controls.ambient.addEventListener('input', debouncedColorUpdate);
     Elements.controls.lockCanvas.addEventListener('change', (e) => {
         AppState.isLocked = e.target.checked;
         document.querySelectorAll('.shape').forEach(shape => {
@@ -498,7 +552,7 @@ function setupEventListeners() {
         } else {
             Elements.controls.ambient.value = AppState.previousAmbientValue;
         }
-        ColorManager.updateAllColors();
+        debouncedColorUpdate();
     });
 
     // Close controls when clicking outside shapes
@@ -519,15 +573,178 @@ function setupEventListeners() {
             AppState.selectedShape = null;
         }
     });
+
+    Elements.controls.glowSlider.addEventListener('input', updateGlowIntensity);
 }
+
+// Use event delegation instead of multiple listeners
+document.addEventListener('click', (e) => {
+    if (e.target.matches('.shape')) {
+        // Handle shape click
+    } else if (e.target.matches('.delete-button')) {
+        // Handle delete
+    }
+});
 
 // Initialize application
 function initializeApp() {
-    Platform.checkIOSFullscreen();
-    setupEventListeners();
-    setupRGBControls();
-    ColorManager.updateAllColors();
+    try {
+        ErrorHandler.init();
+        Platform.checkIOSFullscreen();
+        InputValidator.sanitizeInputs();
+        StateManager.restoreState();
+        setupEventListeners();
+        setupRGBControls();
+        debouncedColorUpdate();
+        updateGlowSliderState();
+
+        // Add auto-save
+        window.addEventListener('beforeunload', () => {
+            StateManager.saveState();
+        });
+
+    } catch (error) {
+        console.error('Initialization failed:', error);
+        // Show user-friendly error message
+        alert('Unable to initialize application. Please refresh the page.');
+    }
 }
 
 // Start the application
 document.addEventListener('DOMContentLoaded', initializeApp);
+
+// Error handling
+const ErrorHandler = {
+    init() {
+        window.addEventListener('error', this.handleError);
+        window.addEventListener('unhandledrejection', this.handlePromiseError);
+    },
+
+    handleError(event) {
+        console.error('Application error:', event.error);
+        // Attempt recovery
+        BoundingBoxManager.hideAll();
+        AppState.isLocked = false;
+    },
+
+    handlePromiseError(event) {
+        console.error('Promise error:', event.reason);
+    }
+};
+
+const StateManager = {
+    saveState() {
+        const state = {
+            shapes: Array.from(document.querySelectorAll('.shape')).map(shape => ({
+                type: shape.classList.contains('circle') ? 'circle' : 'square',
+                position: {
+                    left: shape.style.left,
+                    top: shape.style.top
+                },
+                size: {
+                    width: shape.style.width,
+                    height: shape.style.height
+                }
+            })),
+            settings: {
+                ambient: Elements.controls.ambient.value,
+                warmth: Elements.controls.warmth.value,
+                glow: Elements.controls.glowSlider.value
+            }
+        };
+        localStorage.setItem('lightboxState', JSON.stringify(state));
+    },
+
+    restoreState() {
+        try {
+            const saved = localStorage.getItem('lightboxState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                // Restore settings
+                Object.entries(state.settings).forEach(([key, value]) => {
+                    if (Elements.controls[key]) {
+                        Elements.controls[key].value = value;
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Failed to restore state:', error);
+        }
+    }
+};
+
+const InputValidator = {
+    validateNumericInput(value, min, max) {
+        const num = parseFloat(value);
+        return !isNaN(num) && num >= min && num <= max;
+    },
+
+    sanitizeInputs() {
+        const inputs = document.querySelectorAll('input[type="range"]');
+        inputs.forEach(input => {
+            const min = parseFloat(input.min);
+            const max = parseFloat(input.max);
+            if (!this.validateNumericInput(input.value, min, max)) {
+                input.value = min;
+            }
+        });
+    }
+};
+
+const MemoryManager = {
+    MAX_SHAPES: 50,
+    
+    checkMemoryUsage() {
+        const shapes = document.querySelectorAll('.shape');
+        if (shapes.length > this.MAX_SHAPES) {
+            alert('Maximum number of shapes reached. Please remove some shapes to continue.');
+            return false;
+        }
+        return true;
+    },
+
+    cleanup() {
+        // Remove unused event listeners and references
+        const shapes = document.querySelectorAll('.shape');
+        shapes.forEach(shape => {
+            shape.removeEventListener('mousedown', null);
+            shape.removeEventListener('touchstart', null);
+        });
+    }
+};
+
+const TouchHandler = {
+    touchStartTime: 0,
+    touchTimeout: null,
+
+    handleTouchStart(event) {
+        this.touchStartTime = Date.now();
+        this.touchTimeout = setTimeout(() => {
+            // Long press handler
+        }, 500);
+    },
+
+    handleTouchEnd(event) {
+        clearTimeout(this.touchTimeout);
+        const touchDuration = Date.now() - this.touchStartTime;
+        if (touchDuration < 500) {
+            // Short tap handler
+        }
+    }
+};
+
+function updateGlowSliderState() {
+    const shapes = document.querySelectorAll('.shape');
+    const glowSlider = document.getElementById('glowSlider');
+    const glowLabel = document.querySelector('label[for="glowSlider"]');
+    
+    if (shapes.length === 0) {
+        glowSlider.disabled = true;
+        glowSlider.value = 0;
+        glowLabel.classList.add('disabled');
+        document.documentElement.style.setProperty('--glow-intensity', '0');
+    } else {
+        glowSlider.disabled = false;
+        glowLabel.classList.remove('disabled');
+    }
+}
