@@ -744,27 +744,50 @@ label[for="glowSlider"].disabled {
     }
 }
 
-/* Mobile-specific adjustments */
+/* Mobile black screen fix */
 @media screen and (max-width: 768px) {
-    :root {
-        --drawer-width: 80vw; /* 80% of viewport width on mobile */
-        --drawer-toggle-size: 48px;
-        --drawer-toggle-offset: var(--drawer-toggle-size); /* Ensure toggle remains visible */
-    }
-    
-    /* Ensure the toggle handle is always visible and accessible */
+    /* Ensure the drawer toggle is always visible */
     .drawer-toggle {
-        position: fixed; /* Fixed position to ensure visibility */
-        z-index: 1001; /* Higher z-index than the drawer */
-        right: 0; /* Position at edge of screen */
+        position: fixed;
+        z-index: 9999; /* Extremely high z-index to ensure visibility */
+        right: 0;
+        top: 16px;
+        background: rgba(44, 42, 39, 0.9); /* Semi-transparent background */
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
     
-    /* When drawer is open, position toggle relative to drawer */
+    /* When drawer is open, adjust toggle position */
     .drawer.open .drawer-toggle {
-        position: absolute;
-        right: 16px; /* Position inside the drawer when open */
-        top: 16px;
+        right: 16px;
         border-radius: var(--border-radius-standard);
+        background: var(--color-button-bg);
+    }
+    
+    /* Ensure the drawer is properly positioned */
+    .drawer {
+        width: 80vw;
+        z-index: 9998;
+    }
+    
+    /* Make sure canvas is visible and covering the screen */
+    #canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        background-color: black; /* Ensure the background is black */
+    }
+    
+    /* Ensure shapes are visible above the canvas */
+    .shape {
+        z-index: 10;
+    }
+    
+    /* Ensure bounding boxes are visible */
+    .bounding-box {
+        z-index: 11;
     }
 }
 
@@ -772,6 +795,12 @@ label[for="glowSlider"].disabled {
 @media screen and (max-width: 480px) {
     :root {
         --drawer-width: 85vw; /* Slightly wider on very small screens */
+    }
+    
+    .drawer-toggle {
+        width: 52px; /* Slightly larger */
+        height: 52px;
+        font-size: 20px;
     }
 }
 
@@ -790,6 +819,13 @@ label[for="glowSlider"].disabled {
         /* Make thumb stand out more on iOS */
         border-width: 2px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Additional iOS fixes to ensure the menu button is visible */
+    .drawer-toggle {
+        position: fixed !important;
+        z-index: 9999 !important;
+        right: 0 !important;
     }
 }
 
