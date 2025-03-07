@@ -366,28 +366,58 @@ const ShapeManager = {
 
 // Fullscreen management
 const FullscreenManager = {
+    isInFullScreen: () => {
+        return Boolean(
+            document.fullscreenElement || 
+            document.webkitFullscreenElement || 
+            document.mozFullscreenElement ||
+            document.msFullscreenElement
+        );
+    },
+    
+    requestFullscreen: (element) => {
+        try {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) { /* Safari */
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) { /* IE11 */
+                element.msRequestFullscreen();
+            }
+        } catch (error) {
+            console.error("Fullscreen request failed:", error);
+        }
+    },
+    
+    exitFullscreen: () => {
+        try {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        } catch (error) {
+            console.error("Exit fullscreen failed:", error);
+        }
+    },
+    
     toggle: () => {
         if (Elements.controls.fullscreen.checked) {
             if (Platform.isIOS()) {
                 alert("Fullscreen mode is not supported in iOS browsers. Add this app to your home screen.");
                 Elements.controls.fullscreen.checked = false;
-            } else {
-                document.documentElement.requestFullscreen?.() ||
-                document.documentElement.webkitRequestFullscreen?.() ||
-                document.documentElement.msRequestFullscreen?.();
+            } else if (!FullscreenManager.isInFullScreen()) {
+                FullscreenManager.requestFullscreen(document.documentElement);
             }
-        } else {
-            document.exitFullscreen?.() ||
-            document.webkitExitFullscreen?.() ||
-            document.msExitFullscreen?.();
+        } else if (FullscreenManager.isInFullScreen()) {
+            FullscreenManager.exitFullscreen();
         }
     },
 
     handleChange: () => {
-        Elements.controls.fullscreen.checked = 
-            document.fullscreenElement !== null ||
-            document.webkitFullscreenElement !== null ||
-            document.msFullscreenElement !== null;
+        Elements.controls.fullscreen.checked = FullscreenManager.isInFullScreen();
     }
 };
 
