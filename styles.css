@@ -89,7 +89,9 @@ textarea:focus {
     --color-button-bg: rgba(61, 59, 54, 0.5);
     --color-button-hover: rgba(99, 95, 89, 0.6);
     --transition-standard: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --drawer-width: 280px;
+    --drawer-width: 280px; /* Default for desktop */
+    --drawer-toggle-size: 48px;
+    --drawer-toggle-offset: var(--drawer-toggle-size); /* Default offset matches button size */
     --border-radius-standard: 8px;
     --glow-intensity: 0;
 }
@@ -111,7 +113,7 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Drawer styles */
+/* Drawer styles - adjusted to support responsive widths */
 .drawer {
     position: fixed;
     top: 0;
@@ -136,7 +138,7 @@ body {
 
 .drawer-toggle {
     position: absolute;
-    right: -48px;
+    right: calc(-1 * var(--drawer-toggle-offset));
     top: 16px;
     background: rgb(44, 42, 39);
     border: none;
@@ -144,8 +146,8 @@ body {
     padding: 12px;
     cursor: pointer;
     border-radius: 0 var(--border-radius-standard) var(--border-radius-standard) 0;
-    width: 48px;
-    height: 48px;
+    width: var(--drawer-toggle-size);
+    height: var(--drawer-toggle-size);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -153,9 +155,11 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Updated drawer inner with more bottom padding */
 .drawer-inner {
     height: 100vh;
     padding: 24px;
+    padding-bottom: 80px; /* Increased bottom padding */
     overflow-y: auto;
     scroll-behavior: smooth;
     overscroll-behavior: contain;
@@ -192,6 +196,7 @@ body {
     position: relative; 
 }
 
+/* Base shape styles without glow */
 .shape {
     position: absolute;
     cursor: move;
@@ -203,16 +208,27 @@ body {
     transform: translate3d(0, 0, 0);
     will-change: transform;
     transform-origin: center center;
-    
-    /* Base glow effect */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    background-color: white;
+}
+
+/* Only apply glow when the glowing class is added */
+.shape.glowing {
     box-shadow: 0 0 10px rgba(var(--shape-color), calc(0.95 * var(--glow-intensity))),
                 0 0 20px rgba(var(--shape-color), calc(0.75 * var(--glow-intensity))),
                 0 0 40px rgba(var(--shape-color), calc(0.45 * var(--glow-intensity))),
                 0 0 80px rgba(var(--shape-color), calc(0.25 * var(--glow-intensity)));
     filter: drop-shadow(0 0 8px rgba(var(--shape-color), calc(0.85 * var(--glow-intensity))));
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: auto;
-    background-color: white;
+}
+
+/* More intense glow for selected shapes that are also glowing */
+.shape.glowing.selected {
+    box-shadow: 0 0 15px rgba(var(--shape-color), calc(0.95 * var(--glow-intensity))),
+                0 0 30px rgba(var(--shape-color), calc(0.75 * var(--glow-intensity))),
+                0 0 60px rgba(var(--shape-color), calc(0.45 * var(--glow-intensity))),
+                0 0 100px rgba(var(--shape-color), calc(0.25 * var(--glow-intensity)));
+    filter: drop-shadow(0 0 12px rgba(var(--shape-color), calc(0.85 * var(--glow-intensity))));
 }
 
 .shape.circle { 
@@ -226,6 +242,21 @@ body {
 .shape.locked { 
     cursor: default !important; 
     pointer-events: none; 
+}
+
+/* Remove glow from focus/selection styles - only use bounding box */
+.shape:focus {
+    outline: none; /* Remove default focus outline */
+    z-index: 1;
+    /* No glow effect on focus - bounding box will show selection instead */
+}
+
+/* Update shape focus and active states */
+.shape:focus,
+.shape.selected {
+    outline: none;
+    z-index: 1;
+    /* No glow effect on selection - bounding box will show selection instead */
 }
 
 /* Bounding box styles */
@@ -269,34 +300,6 @@ body {
 
 .bounding-box.square {
     border-radius: 12px;
-}
-
-/* Ensure shape focus is visible */
-.shape:focus {
-    outline: none; /* Remove default focus outline */
-    /* The bounding box will serve as the focus indicator */
-    box-shadow: 0 0 20px rgba(var(--shape-color, 255, 255, 255), 0.3),
-                0 0 40px rgba(var(--shape-color, 255, 255, 255), 0.15),
-                0 0 60px rgba(var(--shape-color, 255, 255, 255), 0.1);
-}
-
-/* Update shape focus and active states */
-.shape:focus,
-.shape.selected {
-    outline: none;
-    z-index: 1;
-    box-shadow: 0 0 20px rgba(var(--shape-color, 255, 255, 255), 0.3),
-                0 0 40px rgba(var(--shape-color, 255, 255, 255), 0.15),
-                0 0 60px rgba(var(--shape-color, 255, 255, 255), 0.1);
-}
-
-/* Enhanced glow effect when shape is selected */
-.shape.selected {
-    box-shadow: 0 0 15px rgba(var(--shape-color), calc(0.95 * var(--glow-intensity))),
-                0 0 30px rgba(var(--shape-color), calc(0.75 * var(--glow-intensity))),
-                0 0 60px rgba(var(--shape-color), calc(0.45 * var(--glow-intensity))),
-                0 0 100px rgba(var(--shape-color), calc(0.25 * var(--glow-intensity)));
-    filter: drop-shadow(0 0 12px rgba(var(--shape-color), calc(0.85 * var(--glow-intensity))));
 }
 
 /* Control elements */
@@ -646,6 +649,18 @@ label[for="glowSlider"].disabled {
     transform: translateY(-1px);
 }
 
+/* Add attribution footer styling */
+.attribution-footer {
+    position: relative;
+    margin-top: 40px;
+    padding-top: 20px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.5;
+    border-top: 1px solid rgba(214, 211, 205, 0.1);
+}
+
 /* Scrollbar styling */
 .drawer-inner::-webkit-scrollbar {
     width: 6px;
@@ -669,12 +684,6 @@ label[for="glowSlider"].disabled {
     .shape-button,
     .checkbox-label {
         padding: 16px;
-    }
-
-    .drawer-toggle {
-        width: 56px;
-        height: 56px;
-        right: -56px;
     }
 
     input[type="range"] {
@@ -732,6 +741,37 @@ label[for="glowSlider"].disabled {
     
     .delete-button:active {
         transform: scale(0.95);
+    }
+}
+
+/* Mobile-specific adjustments */
+@media screen and (max-width: 768px) {
+    :root {
+        --drawer-width: 80vw; /* 80% of viewport width on mobile */
+        --drawer-toggle-size: 48px;
+        --drawer-toggle-offset: var(--drawer-toggle-size); /* Ensure toggle remains visible */
+    }
+    
+    /* Ensure the toggle handle is always visible and accessible */
+    .drawer-toggle {
+        position: fixed; /* Fixed position to ensure visibility */
+        z-index: 1001; /* Higher z-index than the drawer */
+        right: 0; /* Position at edge of screen */
+    }
+    
+    /* When drawer is open, position toggle relative to drawer */
+    .drawer.open .drawer-toggle {
+        position: absolute;
+        right: 16px; /* Position inside the drawer when open */
+        top: 16px;
+        border-radius: var(--border-radius-standard);
+    }
+}
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+    :root {
+        --drawer-width: 85vw; /* Slightly wider on very small screens */
     }
 }
 

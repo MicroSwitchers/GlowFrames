@@ -51,6 +51,10 @@ const Elements = {
 // Platform detection
 const Platform = {
     isIOS: () => /iPhone|iPad|iPod/i.test(navigator.userAgent),
+    isStandalone: () => {
+        return window.navigator.standalone || 
+               window.matchMedia('(display-mode: standalone)').matches;
+    },
     checkIOSFullscreen: () => {
         if (Platform.isIOS() && !Platform.isStandalone()) {
             alert("For fullscreen mode on iPhone, add this app to your home screen and open it from there.");
@@ -298,6 +302,10 @@ const ShapeManager = {
             
             // Focus the new shape for keyboard interaction
             shape.focus();
+            
+            // Apply glow to the new shape based on current slider value
+            updateNewShapeGlow(shape);
+            
             updateGlowSliderState();
         }, null);
     },
@@ -364,7 +372,7 @@ const ShapeManager = {
     }
 };
 
-// Fullscreen management
+// Improved Fullscreen management with better state synchronization
 const FullscreenManager = {
     isInFullScreen: () => {
         return Boolean(
@@ -386,6 +394,8 @@ const FullscreenManager = {
             }
         } catch (error) {
             console.error("Fullscreen request failed:", error);
+            // Ensure checkbox reflects actual state
+            Elements.controls.fullscreen.checked = FullscreenManager.isInFullScreen();
         }
     },
     
@@ -400,26 +410,71 @@ const FullscreenManager = {
             }
         } catch (error) {
             console.error("Exit fullscreen failed:", error);
+            // Ensure checkbox reflects actual state
+            Elements.controls.fullscreen.checked = FullscreenManager.isInFullScreen();
         }
     },
     
     toggle: () => {
-        if (Elements.controls.fullscreen.checked) {
+        // Get current fullscreen state before making changes
+        const isCurrentlyFullscreen = FullscreenManager.isInFullScreen();
+        
+        // Only act if the checkbox state doesn't match the current fullscreen state
+        if (Elements.controls.fullscreen.checked && !isCurrentlyFullscreen) {
+            // User wants to enter fullscreen
             if (Platform.isIOS()) {
                 alert("Fullscreen mode is not supported in iOS browsers. Add this app to your home screen.");
                 Elements.controls.fullscreen.checked = false;
-            } else if (!FullscreenManager.isInFullScreen()) {
+            } else {
                 FullscreenManager.requestFullscreen(document.documentElement);
             }
-        } else if (FullscreenManager.isInFullScreen()) {
+        } else if (!Elements.controls.fullscreen.checked && isCurrentlyFullscreen) {
+            // User wants to exit fullscreen
             FullscreenManager.exitFullscreen();
+        } else {
+            // Checkbox state is out of sync with actual fullscreen state
+            // Make sure checkbox reflects reality
+            Elements.controls.fullscreen.checked = isCurrentlyFullscreen;
         }
     },
 
     handleChange: () => {
-        Elements.controls.fullscreen.checked = FullscreenManager.isInFullScreen();
+        // This handles all fullscreen change events (including Escape key)
+        const isCurrentlyFullscreen = FullscreenManager.isInFullScreen();
+        
+        // Always update checkbox to match actual fullscreen state
+        if (Elements.controls.fullscreen.checked !== isCurrentlyFullscreen) {
+            Elements.controls.fullscreen.checked = isCurrentlyFullscreen;
+        }
+        
+        // Announce change to screen readers
+        announceToScreenReader(isCurrentlyFullscreen 
+            ? "Entered fullscreen mode" 
+            : "Exited fullscreen mode");
     }
 };
+
+// Setup all possible fullscreen change events
+function setupFullscreenEventListeners() {
+    // Standard fullscreen events
+    document.addEventListener('fullscreenchange', FullscreenManager.handleChange);
+    document.addEventListener('webkitfullscreenchange', FullscreenManager.handleChange);
+    document.addEventListener('mozfullscreenchange', FullscreenManager.handleChange);
+    document.addEventListener('MSFullscreenChange', FullscreenManager.handleChange);
+    
+    // Handle checkbox click
+    Elements.controls.fullscreen.addEventListener('change', FullscreenManager.toggle);
+    
+    // Handle F11 key (some browsers)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'F11' || e.keyCode === 122) {
+            // Update checkbox after a short delay to allow browser to change state
+            setTimeout(() => {
+                Elements.controls.fullscreen.checked = FullscreenManager.isInFullScreen();
+            }, 100);
+        }
+    });
+}
 
 // RGB Controls
 function setupRGBControls() {
@@ -461,11 +516,31 @@ function setupRGBControls() {
     });
 }
 
-// Add glow control function
+// Updated glow control function
 function updateGlowIntensity() {
     const rawValue = Elements.controls.glowSlider.value;
     const intensity = rawValue / 100;
     document.documentElement.style.setProperty('--glow-intensity', intensity);
+    
+    // Add or remove a visual indicator class based on glow intensity
+    const shapes = document.querySelectorAll('.shape');
+    shapes.forEach(shape => {
+        if (intensity > 0) {
+            shape.classList.add('glowing');
+        } else {
+            shape.classList.remove('glowing');
+        }
+    });
+}
+
+// Function to apply glow to new shapes based on current slider value
+function updateNewShapeGlow(shape) {
+    const intensity = Elements.controls.glowSlider.value / 100;
+    if (intensity > 0) {
+        shape.classList.add('glowing');
+    } else {
+        shape.classList.remove('glowing');
+    }
 }
 
 // Add helper function for screen reader announcements
@@ -565,11 +640,8 @@ function setupEventListeners() {
         });
     });
 
-    // Fullscreen
-    Elements.controls.fullscreen.addEventListener('change', FullscreenManager.toggle);
-    document.addEventListener('fullscreenchange', FullscreenManager.handleChange);
-    document.addEventListener('webkitfullscreenchange', FullscreenManager.handleChange);
-    document.addEventListener('msfullscreenchange', FullscreenManager.handleChange);
+    // Setup fullscreen events
+    setupFullscreenEventListeners();
 
     // Full surface illumination
     Elements.controls.fullSurface.addEventListener('click', () => {
@@ -615,6 +687,25 @@ document.addEventListener('click', (e) => {
         // Handle delete
     }
 });
+
+// Updated function to ensure glow state is consistent
+function updateGlowSliderState() {
+    const shapes = document.querySelectorAll('.shape');
+    const glowSlider = document.getElementById('glowSlider');
+    const glowLabel = document.querySelector('label[for="glowSlider"]');
+    
+    if (shapes.length === 0) {
+        glowSlider.disabled = true;
+        glowSlider.value = 0;
+        glowLabel.classList.add('disabled');
+        document.documentElement.style.setProperty('--glow-intensity', '0');
+    } else {
+        glowSlider.disabled = false;
+        glowLabel.classList.remove('disabled');
+        // Ensure glow intensity matches the slider value (won't glow until slider is moved)
+        updateGlowIntensity();
+    }
+}
 
 // Initialize application
 function initializeApp() {
@@ -762,19 +853,3 @@ const TouchHandler = {
         }
     }
 };
-
-function updateGlowSliderState() {
-    const shapes = document.querySelectorAll('.shape');
-    const glowSlider = document.getElementById('glowSlider');
-    const glowLabel = document.querySelector('label[for="glowSlider"]');
-    
-    if (shapes.length === 0) {
-        glowSlider.disabled = true;
-        glowSlider.value = 0;
-        glowLabel.classList.add('disabled');
-        document.documentElement.style.setProperty('--glow-intensity', '0');
-    } else {
-        glowSlider.disabled = false;
-        glowLabel.classList.remove('disabled');
-    }
-}
