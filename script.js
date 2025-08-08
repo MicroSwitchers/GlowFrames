@@ -700,7 +700,13 @@ function setupEventListeners() {
 
     // Controls
     Elements.controls.warmth.addEventListener('input', debouncedColorUpdate);
-    Elements.controls.ambient.addEventListener('input', debouncedColorUpdate);
+    Elements.controls.ambient.addEventListener('input', (e) => {
+        // If not in Full Surface mode, update the previous value so it can be restored later
+        if (!AppState.isFullyIlluminated) {
+            AppState.previousAmbientValue = e.target.value;
+        }
+        debouncedColorUpdate();
+    });
     Elements.controls.lockCanvas.addEventListener('change', (e) => {
         AppState.isLocked = e.target.checked;
         document.querySelectorAll('.shape').forEach(shape => {
@@ -738,14 +744,17 @@ function setupEventListeners() {
 
     // Full surface illumination
     Elements.controls.fullSurface.addEventListener('click', () => {
-        AppState.isFullyIlluminated = !AppState.isFullyIlluminated;
-        Elements.controls.fullSurface.classList.toggle('active', AppState.isFullyIlluminated);
-
         if (AppState.isFullyIlluminated) {
-            AppState.previousAmbientValue = Elements.controls.ambient.value;
-            Elements.controls.ambient.value = 100;
-        } else {
+            // If Full Surface is currently active, turn it off and restore previous value
+            AppState.isFullyIlluminated = false;
+            Elements.controls.fullSurface.classList.remove('active');
             Elements.controls.ambient.value = AppState.previousAmbientValue;
+        } else {
+            // If Full Surface is not active, turn it on and save current value
+            AppState.previousAmbientValue = Elements.controls.ambient.value;
+            AppState.isFullyIlluminated = true;
+            Elements.controls.fullSurface.classList.add('active');
+            Elements.controls.ambient.value = 100;
         }
         debouncedColorUpdate();
     });
@@ -808,6 +817,10 @@ function initializeApp() {
         Platform.checkIOSFullscreen();
         InputValidator.sanitizeInputs();
         StateManager.restoreState();
+        
+        // Initialize previousAmbientValue with the current slider value
+        AppState.previousAmbientValue = Elements.controls.ambient.value;
+        
         setupEventListeners();
         setupRGBControls();
         debouncedColorUpdate();
