@@ -91,6 +91,33 @@ textarea {
     --glow-intensity: 0;
 }
 
+/* Fallback styles for browsers without CSS custom properties support */
+.no-css-vars body {
+    background: #0A0A0B;
+    color: #FFFFFF;
+}
+
+.no-css-vars .drawer {
+    background: #141417;
+    width: 320px;
+}
+
+.no-css-vars .shape-button {
+    background: #1C1C20;
+    color: #FFFFFF;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.no-css-vars .shape {
+    background: white;
+    border-radius: 16px;
+}
+
+.no-css-vars .bounding-box {
+    border: 2px solid #7C3AED;
+}
+
 /* Base Styles */
 * {
     margin: 0;
@@ -127,6 +154,14 @@ body {
     line-height: 1.5;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+    /* Fallback colors for browsers without CSS custom properties */
+    background: #0A0A0B;
+    color: #FFFFFF;
+    /* Prevent mobile browser zoom/bounce */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: 100%;
 }
 
 /* Canvas */
@@ -145,6 +180,8 @@ body {
     left: 0;
     height: 100%;
     width: var(--drawer-width);
+    /* Fallback background for browsers without backdrop-filter */
+    background: rgba(20, 20, 23, 0.95);
     background: linear-gradient(145deg, 
         #1A1A1D 0%, 
         #16161A 25%,
@@ -152,12 +189,16 @@ body {
         #141418 75%,
         #0F0F12 100%);
     transform: translateX(calc(-1 * var(--drawer-width)));
+    transform: translateX(-320px); /* Fallback for CSS custom properties */
     transition: transform var(--transition-normal);
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1); /* Fallback */
     z-index: 1000;
     box-shadow: 
         var(--shadow-xl), 
         0 0 100px rgba(0, 0, 0, 0.6),
         inset 1px 0 0 rgba(255, 255, 255, 0.05);
+    /* Fallback box-shadow */
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -274,6 +315,8 @@ body {
     font-size: 1.25rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+    /* Fallback color for browsers without background-clip support */
+    color: #FFFFFF;
     background: linear-gradient(135deg, 
         #FFFFFF 0%, 
         #E0E7FF 50%,
@@ -281,6 +324,19 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    /* Graceful degradation - only apply transparency if background-clip is supported */
+}
+
+/* Fallback for browsers that don't support background-clip: text */
+@supports not (-webkit-background-clip: text) {
+    .app-header h2 {
+        color: #FFFFFF !important;
+        background: none !important;
+        -webkit-text-fill-color: inherit !important;
+    }
+}
+
+.app-header h2 {
     flex: 1;
     min-width: 0;
     line-height: 1.2;
@@ -378,14 +434,28 @@ body {
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
+    /* Fallback color for browsers without background-clip support */
+    color: rgba(255, 255, 255, 0.7);
     background: linear-gradient(135deg, var(--color-text-secondary) 0%, rgba(124, 58, 237, 0.8) 100%);
+    /* Fallback background using CSS custom properties fallback */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(124, 58, 237, 0.8) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: var(--spacing-sm);
+    margin-bottom: 8px; /* Fallback */
     text-transform: uppercase;
     letter-spacing: 0.05em;
     position: relative;
+}
+
+/* Fallback for browsers that don't support background-clip: text */
+@supports not (-webkit-background-clip: text) {
+    .control-section label {
+        color: rgba(255, 255, 255, 0.7) !important;
+        background: none !important;
+        -webkit-text-fill-color: inherit !important;
+    }
 }
 
 .control-section label::after {
@@ -865,10 +935,15 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     }
     
     .drawer-toggle {
-        position: fixed;
-        top: var(--spacing-md);
-        right: var(--spacing-md);
+        position: fixed !important;
+        top: 16px;
+        right: 16px;
         z-index: 1001;
+        background: rgba(20, 20, 23, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
     
     .app-header h2 {
@@ -877,6 +952,7 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     
     .shape-button {
         padding: var(--spacing-md);
+        padding: 16px; /* Fallback */
     }
 }
 
@@ -907,8 +983,15 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     }
     
     .drawer-toggle {
-        top: var(--spacing-sm);
-        right: var(--spacing-sm);
+        position: fixed !important;
+        top: 12px !important;
+        right: 12px !important;
+        z-index: 1001;
+        background: rgba(20, 20, 23, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 }
 
@@ -919,23 +1002,42 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     }
     
     .drawer-toggle {
+        position: fixed !important;
+        top: 16px !important;
+        right: 16px !important;
         width: 56px;
         height: 56px;
-        right: -56px;
         font-size: 24px;
+        z-index: 1001;
+        background: rgba(20, 20, 23, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        /* Ensure minimum touch target size */
+        min-width: 44px;
+        min-height: 44px;
     }
     
     .shape-button {
         padding: var(--spacing-lg);
+        padding: 24px; /* Fallback */
         font-size: 1rem;
+        /* Ensure minimum touch target size */
+        min-height: 44px;
     }
     
     .checkbox-label {
         padding: var(--spacing-lg);
+        padding: 24px; /* Fallback */
+        /* Ensure minimum touch target size */
+        min-height: 44px;
     }
     
     input[type="range"] {
         height: 56px;
+        /* Larger touch targets for mobile */
+        min-height: 44px;
     }
     
     input[type="range"]::-webkit-slider-thumb {
@@ -955,6 +1057,9 @@ input[type="range"]:disabled::-webkit-slider-thumb {
         top: -20px;
         right: -20px;
         font-size: 22px;
+        /* Ensure minimum touch target size */
+        min-width: 44px;
+        min-height: 44px;
     }
     
     .resize-handle {
@@ -962,15 +1067,21 @@ input[type="range"]:disabled::-webkit-slider-thumb {
         height: 36px;
         bottom: -18px;
         right: -18px;
+        /* Ensure minimum touch target size */
+        min-width: 44px;
+        min-height: 44px;
     }
     
-    .app-logo {
-        width: 56px;
-        height: 56px;
+    /* Prevent accidental zoom on double tap */
+    * {
+        touch-action: manipulation;
     }
     
-    .app-header h2 {
-        font-size: 1.5rem;
+    /* Better touch feedback */
+    .shape-button:active,
+    .checkbox-label:active,
+    .drawer-toggle:active {
+        transform: scale(0.98);
     }
 }
 

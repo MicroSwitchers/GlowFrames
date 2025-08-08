@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <!-- Additional mobile optimization meta tags -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
     <title>VisionGlowFrames - Light Box</title>
     <meta name="description" content="A therapeutic light box app for children with CVI (Cortical Visual Impairment)">
     <meta name="keywords" content="CVI, cortical visual impairment, light therapy, accessibility, vision therapy">
@@ -18,6 +25,30 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="./styles.css">
+    
+    <!-- Fallback for browsers that don't support CSS custom properties -->
+    <style>
+        /* Fallback styles for older browsers */
+        @supports not (--css: variables) {
+            body { background: #0A0A0B; color: #FFFFFF; }
+            .drawer { background: #141417; }
+            .shape-button { background: #1C1C20; color: #FFFFFF; }
+            .shape { background: white; }
+            input[type="range"] { background: transparent; }
+        }
+        
+        /* Fallback for backdrop-filter */
+        @supports not (backdrop-filter: blur(1px)) {
+            .drawer { background: rgba(20, 20, 23, 0.95) !important; }
+            .app-header::before { background: rgba(255, 255, 255, 0.05) !important; }
+        }
+        
+        /* Fallback for background-clip: text */
+        @supports not (-webkit-background-clip: text) {
+            .app-header h2 { color: #FFFFFF !important; }
+            .control-section label { color: rgba(255, 255, 255, 0.7) !important; }
+        }
+    </style>
     
     <!-- Primary favicon and app icons -->
     <link rel="icon" type="image/png" href="glowframeicon.png">
@@ -157,6 +188,48 @@
 
     <div id="canvas"></div>
 
+    <!-- Polyfills for older browsers -->
+    <script>
+        // Polyfill for Object.assign (IE11 and older mobile browsers)
+        if (typeof Object.assign !== 'function') {
+            Object.assign = function(target) {
+                if (target == null) throw new TypeError('Cannot convert undefined or null to object');
+                var to = Object(target);
+                for (var index = 1; index < arguments.length; index++) {
+                    var nextSource = arguments[index];
+                    if (nextSource != null) {
+                        for (var nextKey in nextSource) {
+                            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                                to[nextKey] = nextSource[nextKey];
+                            }
+                        }
+                    }
+                }
+                return to;
+            };
+        }
+        
+        // Polyfill for CSS custom properties support check
+        if (!window.CSS || !CSS.supports('--css', 'variables')) {
+            document.documentElement.className += ' no-css-vars';
+        }
+        
+        // Simple feature detection for modern JS
+        var supportsModernJS = (function() {
+            try {
+                new Function('const a = () => {}');
+                return true;
+            } catch (e) {
+                return false;
+            }
+        })();
+        
+        if (!supportsModernJS) {
+            // Fallback message for very old browsers
+            document.body.innerHTML = '<div style="padding: 20px; background: #0A0A0B; color: white; text-align: center; font-family: Arial, sans-serif;"><h2>Browser Update Required</h2><p>This app requires a modern browser. Please update your browser or try on a different device.</p></div>';
+        }
+    </script>
+    
     <script src="./script.js"></script>
 </body>
 </html>
