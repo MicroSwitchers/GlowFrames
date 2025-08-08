@@ -1,5 +1,5 @@
 // Service Worker for VisionGlowFrames PWA
-const VERSION = 'v1.0.2';
+const VERSION = 'v1.0.3';
 const STATIC_CACHE = `glowframes-static-${VERSION}`;
 const DYNAMIC_CACHE = `glowframes-dynamic-${VERSION}`;
 
@@ -82,8 +82,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Cache First strategy for same-origin static assets
-  if (isSameOrigin && staticAssets.some(asset => url.pathname.endsWith(asset.replace('./', '')))) {
+  // Network First strategy for critical files to ensure updates
+  const criticalFiles = ['index.html', 'styles.css', 'script.js', 'manifest.json'];
+  if (isSameOrigin && criticalFiles.some(file => url.pathname.includes(file))) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return caches.match(request) || response;
+          }
+          const responseClone = response.clone();
+          caches.open(STATIC_CACHE)
+            .then((cache) => cache.put(request, responseClone));
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request);
+        })
+    );
+  } 
+  // Cache First strategy for other same-origin static assets
+  else if (isSameOrigin && staticAssets.some(asset => url.pathname.endsWith(asset.replace('./', '')))) {
     event.respondWith(
       caches.match(request)
         .then((response) => {

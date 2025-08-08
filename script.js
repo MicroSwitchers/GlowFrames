@@ -1,3 +1,36 @@
+// PWA Update Detection
+const APP_VERSION = '1.0.3';
+
+// Check for PWA updates
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+        .then((registration) => {
+            console.log('Service Worker registered:', registration);
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // New content is available, prompt user to update
+                        if (confirm('A new version is available! Refresh to update?')) {
+                            newWorker.postMessage({ type: 'SKIP_WAITING' });
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        })
+        .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+        });
+    
+    // Listen for SW updates
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+    });
+}
+
 // State management
 const AppState = {
     selectedShape: null,
