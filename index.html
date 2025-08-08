@@ -2,32 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <title>VisionGlowFrames - Light Box</title>
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="icon" type="image/png" href="glowframeicon.png">
+    <meta name="description" content="A therapeutic light box app for children with CVI (Cortical Visual Impairment)">
+    <meta name="keywords" content="CVI, cortical visual impairment, light therapy, accessibility, vision therapy">
+    <meta name="author" content="VisionGlowFrames">
+    <meta name="robots" content="index, follow">
     
-    <!-- Add these lines near the top of your head section -->
-    <link rel="preconnect" href="/fonts">
-    <link rel="preload" href="critical.css" as="style">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Stylesheets -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="./styles.css">
+    
+    <!-- Primary favicon and app icons -->
+    <link rel="icon" type="image/png" href="glowframeicon.png">
+    <link rel="apple-touch-icon" href="glowframeicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="glowframeicon.png">
+    
+    <!-- Windows Metro tiles -->
+    <meta name="msapplication-TileImage" content="glowframeicon.png">
+    <meta name="msapplication-TileColor" content="#7C3AED">
+    <meta name="msapplication-config" content="browserconfig.xml">
     
     <!-- iOS specific meta tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GlowFrames">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#222222">
     
-    <!-- Add PWA splash screen images -->
-    <link rel="apple-touch-startup-image" href="splash.png">
-    <link rel="apple-touch-icon" href="glowframeicon.png">
+    <!-- Theme colors -->
+    <meta name="theme-color" content="#7C3AED">
+    <meta name="msapplication-navbutton-color" content="#7C3AED">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- PWA splash screens for iOS -->
+    <link rel="apple-touch-startup-image" href="glowframeicon.png">
+    
+    <!-- Open Graph meta tags for social sharing -->
+    <meta property="og:title" content="VisionGlowFrames - Light Box">
+    <meta property="og:description" content="A therapeutic light box app for children with CVI (Cortical Visual Impairment)">
+    <meta property="og:image" content="glowframeicon.png">
+    <meta property="og:url" content="">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="VisionGlowFrames - Light Box">
+    <meta name="twitter:description" content="A therapeutic light box app for children with CVI (Cortical Visual Impairment)">
+    <meta name="twitter:image" content="glowframeicon.png">
 </head>
 <body>
     <div class="drawer" role="complementary" aria-label="Controls">
         <button class="drawer-toggle" aria-expanded="false" aria-controls="drawer-content" aria-label="Toggle menu">☰</button>
-        <div id="drawer-content" class="drawer-inner">
+        <div id="drawer-content" class="drawer-inner" aria-hidden="true">
             <div class="app-header">
                 <img src="glowframeicon.png" alt="GlowFrame" class="app-logo">
-                <h2>VisionGlowFrames</h2>
+                <h2>Vision Glow Frames</h2>
             </div>
 
             <div class="shape-buttons-container">
@@ -55,16 +90,19 @@
 
             <div class="control-section">
                 <label for="ambient">Background Light</label>
-                <input type="range" id="ambient" min="0" max="100" value="0">
+                <input type="range" id="ambient" min="0" max="100" value="0" aria-describedby="ambient-desc">
+                <div id="ambient-desc" class="sr-only">Control the background light intensity from 0 to 100</div>
                 
                 <div style="margin-top: 24px;">
                     <label for="warmth">Light Warmth</label>
-                    <input type="range" id="warmth" min="0" max="100" value="0">
+                    <input type="range" id="warmth" min="0" max="100" value="100" aria-describedby="warmth-desc">
+                    <div id="warmth-desc" class="sr-only">Control the color temperature from cool to warm</div>
                 </div>
 
                 <div style="margin-top: 24px;">
                     <label for="glowSlider">Shape Glow</label>
-                    <input type="range" id="glowSlider" min="0" max="100" value="0">
+                    <input type="range" id="glowSlider" min="0" max="100" value="0" aria-describedby="glow-desc">
+                    <div id="glow-desc" class="sr-only">Control the glow effect around shapes</div>
                 </div>
             </div>
 
@@ -113,12 +151,6 @@
                         <button id="resetRGB" class="reset-button">Reset to White</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Attribution Footer -->
-            <div class="attribution-footer">
-                Niall Brown - Early Childhood Vision Consultant (ECVC)<br>
-                Generated with the assistance of Claude AI
             </div>
         </div>
     </div>
