@@ -89,7 +89,6 @@
 </head>
 <body>
     <div class="drawer" role="complementary" aria-label="Controls">
-        <button class="drawer-toggle" aria-expanded="false" aria-controls="drawer-content" aria-label="Toggle menu">☰</button>
         <div id="drawer-content" class="drawer-inner" aria-hidden="true">
             <div class="app-header">
                 <img src="glowframeicon.png" alt="GlowFrame" class="app-logo">
@@ -185,6 +184,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Toggle moved outside drawer to avoid transform/fixed issues and stay viewport-anchored -->
+    <button class="drawer-toggle" aria-expanded="false" aria-controls="drawer-content" aria-label="Toggle menu">☰</button>
 
     <div id="canvas"></div>
 

@@ -232,6 +232,29 @@ body {
     font-weight: 500;
 }
 
+/* Override base to viewport-anchored left edge on desktop */
+@media (min-width: 1025px) {
+    .drawer-toggle {
+        position: fixed;
+        top: 20px;
+        /* When drawer is closed, keep handle visible near the left edge */
+        left: 8px;
+        right: auto;
+        z-index: 1002;
+        background: rgba(124, 58, 237, 0.9);
+        color: #fff;
+        width: 48px;
+        height: 48px;
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* When drawer opens on desktop, align toggle with drawer's right edge */
+    .drawer.open ~ .drawer-toggle {
+        left: var(--drawer-width); /* 320px - exactly at drawer edge */
+    }
+}
+
 .drawer-toggle:hover {
     background: rgba(255, 255, 255, 0.25);
     color: white;
@@ -920,14 +943,46 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 }
 
 /* Responsive Design Breakpoints */
+
+/* Tablet and small laptop - catch toggle before it slides off */
+@media (max-width: 1024px) {
+    .drawer-toggle {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        z-index: 1002 !important;
+        transform: none !important;
+        background: rgba(124, 58, 237, 0.9) !important;
+        border-radius: 50% !important;
+        width: 60px !important;
+        height: 60px !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    .drawer.open .drawer-toggle {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        z-index: 1002 !important;
+        transform: none !important;
+    }
+}
+
 @media (max-width: 768px) {
     :root {
-        --drawer-width: 300px;
+        --drawer-width: 100vw; /* Full width on mobile */
     }
     
     .drawer {
         width: 100vw;
-        transform: translateX(100%);
+        height: 100vh;
+        left: 0;
+        top: 0;
+        /* Slide from left side like desktop, but full width */
+        transform: translateX(-100%);
     }
     
     .drawer.open {
@@ -936,14 +991,30 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     
     .drawer-toggle {
         position: fixed !important;
-        top: 16px;
-        right: 16px;
-        z-index: 1001;
-        background: rgba(20, 20, 23, 0.9);
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important; /* Override any left positioning */
+        z-index: 1002 !important; /* Higher than drawer */
+        background: rgba(124, 58, 237, 0.9) !important;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border-radius: 50% !important; /* Circular button */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        width: 60px !important;
+        height: 60px !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        /* Completely override any transform or positioning from parent */
+        transform: none !important;
+    }
+    
+    /* Ensure toggle stays visible even when drawer is open */
+    .drawer.open .drawer-toggle {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        z-index: 1002 !important;
+        transform: none !important;
     }
     
     .app-header h2 {
@@ -972,6 +1043,45 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     
     .drawer-inner {
         padding: var(--spacing-md);
+    }
+    
+    /* Apply same mobile drawer fixes for small phones */
+    .drawer {
+        width: 100vw !important;
+        left: 0 !important;
+        top: 0 !important;
+    }
+    
+    .drawer.open {
+        transform: translateX(0) !important;
+    }
+    
+    .drawer:not(.open) {
+        transform: translateX(-100%) !important;
+    }
+    
+    .drawer-toggle {
+        position: fixed !important;
+        top: 15px !important;
+        right: 15px !important;
+        left: auto !important; /* Override any left positioning */
+        z-index: 1002 !important;
+        width: 50px !important;
+        height: 50px !important;
+        border-radius: 50% !important;
+        background: rgba(124, 58, 237, 0.9) !important;
+        transform: none !important; /* Override any transforms */
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    .drawer.open .drawer-toggle {
+        position: fixed !important;
+        top: 15px !important;
+        right: 15px !important;
+        left: auto !important;
+        z-index: 1002 !important;
+        transform: none !important;
     }
 }
 
