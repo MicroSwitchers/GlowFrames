@@ -19,16 +19,16 @@
     <meta name="robots" content="index, follow">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="./manifest.json?v=1.0.4">
+    <link rel="manifest" href="./manifest.json?v=1.0.5">
     
     <!-- Stylesheets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="./styles.css?v=1.0.4" as="style">
-    <link rel="stylesheet" href="./styles.css?v=1.0.4">
+    <link rel="preload" href="./styles.css?v=1.0.5" as="style">
+    <link rel="stylesheet" href="./styles.css?v=1.0.5">
     
     <!-- Cache busting meta tag -->
-    <meta name="app-version" content="1.0.4">
+    <meta name="app-version" content="1.0.5">
     
     <!-- Fallback for browsers that don't support CSS custom properties -->
     <style>
@@ -83,15 +83,100 @@
             input[type="range"] {
                 background: transparent !important;
                 color: #FFFFFF !important;
+                -webkit-appearance: none !important;
+                appearance: none !important;
+                width: 100% !important;
+                height: 48px !important;
+                margin: 8px 0 16px !important;
+                cursor: pointer !important;
             }
             
-            input[type="range"]::-webkit-slider-track {
+            input[type="range"]::-webkit-slider-runnable-track {
                 background: rgba(255, 255, 255, 0.2) !important;
+                height: 6px !important;
+                border-radius: 8px !important;
+                border: none !important;
+                outline: none !important;
             }
             
             input[type="range"]::-webkit-slider-thumb {
-                background: #7C3AED !important;
+                -webkit-appearance: none !important;
+                appearance: none !important;
+                width: 20px !important;
+                height: 20px !important;
+                border-radius: 50% !important;
+                background: #FFFFFF !important;
+                border: 2px solid #7C3AED !important;
+                margin-top: -9px !important;
+                cursor: pointer !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+            }
+            
+            input[type="range"]::-moz-range-track {
+                background: rgba(255, 255, 255, 0.2) !important;
+                height: 6px !important;
+                border-radius: 8px !important;
+                border: none !important;
+                outline: none !important;
+            }
+            
+            input[type="range"]::-moz-range-thumb {
+                width: 20px !important;
+                height: 20px !important;
+                border-radius: 50% !important;
+                background: #FFFFFF !important;
+                border: 2px solid #7C3AED !important;
+                cursor: pointer !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+                -moz-appearance: none !important;
+            }
+            
+            /* RGB Specific Sliders */
+            #redSlider::-webkit-slider-thumb {
+                background: #FF4444 !important;
                 border: 2px solid #FFFFFF !important;
+            }
+            
+            #greenSlider::-webkit-slider-thumb {
+                background: #44FF44 !important;
+                border: 2px solid #FFFFFF !important;
+            }
+            
+            #blueSlider::-webkit-slider-thumb {
+                background: #4444FF !important;
+                border: 2px solid #FFFFFF !important;
+            }
+            
+            #redSlider::-moz-range-thumb {
+                background: #FF4444 !important;
+                border: 2px solid #FFFFFF !important;
+            }
+            
+            #greenSlider::-moz-range-thumb {
+                background: #44FF44 !important;
+                border: 2px solid #FFFFFF !important;
+            }
+            
+            #blueSlider::-moz-range-thumb {
+                background: #4444FF !important;
+                border: 2px solid #FFFFFF !important;
+            }
+            
+            /* Fallback for unsupported slider styling */
+            @supports not (-webkit-appearance: none) {
+                input[type="range"] {
+                    background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                    border-radius: 8px !important;
+                    height: 8px !important;
+                }
+            }
+            
+            /* Force re-render for PWA */
+            .pwa-mode input[type="range"] {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
             
             .checkbox-label {
@@ -331,6 +416,22 @@
                         el.style.display = el.style.display || '';
                     }
                 });
+                
+                // Specific slider fixes
+                const sliders = document.querySelectorAll('input[type="range"]');
+                sliders.forEach(slider => {
+                    // Force re-render of sliders
+                    slider.style.display = 'none';
+                    slider.offsetHeight; // Force reflow
+                    slider.style.display = 'block';
+                    
+                    // Ensure slider properties are set
+                    slider.style.webkitAppearance = 'none';
+                    slider.style.appearance = 'none';
+                    slider.style.background = 'transparent';
+                    slider.style.width = '100%';
+                    slider.style.height = '48px';
+                });
             }, 100);
         }
         
@@ -350,6 +451,6 @@
         }
     </script>
     
-    <script src="./script.js?v=1.0.4"></script>
+    <script src="./script.js?v=1.0.5"></script>
 </body>
 </html>

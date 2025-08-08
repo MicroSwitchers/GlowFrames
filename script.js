@@ -1,5 +1,5 @@
 // PWA Update Detection
-const APP_VERSION = '1.0.4';
+const APP_VERSION = '1.0.5';
 
 // Check for PWA updates
 if ('serviceWorker' in navigator) {
