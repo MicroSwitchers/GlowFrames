@@ -1,5 +1,5 @@
 // Service Worker for VisionGlowFrames PWA
-const VERSION = 'v1.0.3';
+const VERSION = 'v1.0.4';
 const STATIC_CACHE = `glowframes-static-${VERSION}`;
 const DYNAMIC_CACHE = `glowframes-dynamic-${VERSION}`;
 

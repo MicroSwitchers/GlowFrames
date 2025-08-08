@@ -19,18 +19,111 @@
     <meta name="robots" content="index, follow">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="./manifest.json?v=1.0.3">
+    <link rel="manifest" href="./manifest.json?v=1.0.4">
     
     <!-- Stylesheets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="./styles.css?v=1.0.3">
+    <link rel="preload" href="./styles.css?v=1.0.4" as="style">
+    <link rel="stylesheet" href="./styles.css?v=1.0.4">
     
     <!-- Cache busting meta tag -->
-    <meta name="app-version" content="1.0.3">
+    <meta name="app-version" content="1.0.4">
     
     <!-- Fallback for browsers that don't support CSS custom properties -->
     <style>
+        /* PWA Standalone Mode Fixes */
+        @media (display-mode: standalone) {
+            body {
+                background: #0A0A0B !important;
+                color: #FFFFFF !important;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+            }
+            
+            .drawer {
+                background: linear-gradient(145deg, #1A1A1D 0%, #16161A 25%, #1E1E23 50%, #141418 75%, #0F0F12 100%) !important;
+                color: #FFFFFF !important;
+            }
+            
+            .shape-button {
+                background: #1C1C20 !important;
+                color: #FFFFFF !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                font-size: 0.9rem !important;
+                font-weight: 500 !important;
+            }
+            
+            .shape-button svg {
+                stroke: currentColor !important;
+            }
+            
+            .app-header h2 {
+                color: #FFFFFF !important;
+                font-size: 1.5rem !important;
+                font-weight: 600 !important;
+            }
+            
+            .control-section label {
+                color: rgba(255, 255, 255, 0.9) !important;
+                font-size: 1rem !important;
+                font-weight: 500 !important;
+            }
+            
+            .drawer-toggle {
+                background: rgba(107, 114, 128, 0.9) !important;
+                color: #FFFFFF !important;
+                font-size: 18px !important;
+                font-weight: 600 !important;
+            }
+            
+            .drawer.open ~ .drawer-toggle {
+                background: rgba(124, 58, 237, 0.9) !important;
+            }
+            
+            input[type="range"] {
+                background: transparent !important;
+                color: #FFFFFF !important;
+            }
+            
+            input[type="range"]::-webkit-slider-track {
+                background: rgba(255, 255, 255, 0.2) !important;
+            }
+            
+            input[type="range"]::-webkit-slider-thumb {
+                background: #7C3AED !important;
+                border: 2px solid #FFFFFF !important;
+            }
+            
+            .checkbox-label {
+                color: #FFFFFF !important;
+                font-size: 1rem !important;
+            }
+            
+            .checkbox-label input[type="checkbox"] + span {
+                color: #FFFFFF !important;
+            }
+            
+            .collapsible-header {
+                color: #FFFFFF !important;
+                background: rgba(255, 255, 255, 0.05) !important;
+                font-size: 1rem !important;
+                font-weight: 600 !important;
+            }
+            
+            .slider-header span {
+                color: #FFFFFF !important;
+                font-size: 0.9rem !important;
+                font-weight: 500 !important;
+            }
+            
+            .reset-button {
+                background: rgba(124, 58, 237, 0.9) !important;
+                color: #FFFFFF !important;
+                font-size: 0.9rem !important;
+                font-weight: 500 !important;
+            }
+        }
+        
         /* Fallback styles for older browsers */
         @supports not (--css: variables) {
             body { background: #0A0A0B; color: #FFFFFF; }
@@ -219,6 +312,28 @@
             document.documentElement.className += ' no-css-vars';
         }
         
+        // PWA Detection and Fixes
+        function isPWA() {
+            return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true ||
+                   document.referrer.includes('android-app://');
+        }
+        
+        if (isPWA()) {
+            document.documentElement.classList.add('pwa-mode');
+            console.log('Running in PWA mode - applying fixes');
+            
+            // Force style recalculation for PWA
+            setTimeout(() => {
+                const allElements = document.querySelectorAll('*');
+                allElements.forEach(el => {
+                    if (el.style) {
+                        el.style.display = el.style.display || '';
+                    }
+                });
+            }, 100);
+        }
+        
         // Simple feature detection for modern JS
         var supportsModernJS = (function() {
             try {
@@ -235,6 +350,6 @@
         }
     </script>
     
-    <script src="./script.js?v=1.0.3"></script>
+    <script src="./script.js?v=1.0.4"></script>
 </body>
 </html>
