@@ -1,479 +1,428 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="referrer" content="no-referrer-when-downgrade">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECVC App Selector</title>
+  
+  <!-- Tailwind CSS for modern styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Use the Inter font family defined above */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc; /* A slightly lighter slate color */
+    }
     
-    <!-- Additional mobile optimization meta tags -->
-    <meta name="format-detection" content="telephone=no">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-touch-fullscreen" content="yes">
-    <title>VisionGlowFrames - Light Box</title>
-    <meta name="description" content="A therapeutic light box app for children with CVI (Cortical Visual Impairment)">
-    <meta name="keywords" content="CVI, cortical visual impairment, light therapy, accessibility, vision therapy">
-    <meta name="author" content="VisionGlowFrames">
-    <meta name="robots" content="index, follow">
+    /* Card hover effect */
+    .card-hover-effect {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover-effect:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="./manifest.json?v=1.0.5">
-    
-    <!-- Stylesheets -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="./styles.css?v=1.0.5" as="style">
-    <link rel="stylesheet" href="./styles.css?v=1.0.5">
-    
-    <!-- Cache busting meta tag -->
-    <meta name="app-version" content="1.0.5">
-    
-    <!-- Fallback for browsers that don't support CSS custom properties -->
-    <style>
-        /* PWA Standalone Mode Fixes */
-        @media (display-mode: standalone) {
-            body {
-                background: #0A0A0B !important;
-                color: #FFFFFF !important;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
-            }
-            
-            .drawer {
-                background: linear-gradient(145deg, #1A1A1D 0%, #16161A 25%, #1E1E23 50%, #141418 75%, #0F0F12 100%) !important;
-                color: #FFFFFF !important;
-            }
-            
-            .shape-button {
-                background: #1C1C20 !important;
-                color: #FFFFFF !important;
-                border: 1px solid rgba(255, 255, 255, 0.1) !important;
-                font-size: 0.9rem !important;
-                font-weight: 500 !important;
-            }
-            
-            .shape-button svg {
-                stroke: currentColor !important;
-            }
-            
-            .app-header h2 {
-                color: #FFFFFF !important;
-                font-size: 1.5rem !important;
-                font-weight: 600 !important;
-            }
-            
-            .control-section label {
-                color: rgba(255, 255, 255, 0.9) !important;
-                font-size: 1rem !important;
-                font-weight: 500 !important;
-            }
-            
-            .drawer-toggle {
-                background: rgba(107, 114, 128, 0.9) !important;
-                color: #FFFFFF !important;
-                font-size: 18px !important;
-                font-weight: 600 !important;
-            }
-            
-            .drawer.open ~ .drawer-toggle {
-                background: rgba(124, 58, 237, 0.9) !important;
-            }
-            
-            input[type="range"] {
-                background: transparent !important;
-                color: #FFFFFF !important;
-                -webkit-appearance: none !important;
-                appearance: none !important;
-                width: 100% !important;
-                height: 48px !important;
-                margin: 8px 0 16px !important;
-                cursor: pointer !important;
-            }
-            
-            input[type="range"]::-webkit-slider-runnable-track {
-                background: linear-gradient(to right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.25)) !important;
-                height: 6px !important;
-                border-radius: 8px !important;
-                border: none !important;
-                outline: none !important;
-                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-            }
-            
-            input[type="range"]::-webkit-slider-thumb {
-                -webkit-appearance: none !important;
-                appearance: none !important;
-                width: 20px !important;
-                height: 20px !important;
-                border-radius: 50% !important;
-                background: white !important;
-                border: none !important;
-                margin-top: -7px !important;
-                cursor: pointer !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                position: relative !important;
-                z-index: 2 !important;
-            }
-            
-            input[type="range"]::-moz-range-track {
-                background: linear-gradient(to right, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.25)) !important;
-                height: 6px !important;
-                border-radius: 8px !important;
-                border: none !important;
-                outline: none !important;
-                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-            }
-            
-            input[type="range"]::-moz-range-thumb {
-                width: 20px !important;
-                height: 20px !important;
-                border-radius: 50% !important;
-                background: white !important;
-                border: none !important;
-                cursor: pointer !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-                -moz-appearance: none !important;
-                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            }
-            
-            /* Hover effects for thumbs */
-            input[type="range"]:hover::-webkit-slider-thumb {
-                transform: scale(1.1) !important;
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25), 0 3px 6px rgba(0, 0, 0, 0.15) !important;
-            }
-            
-            input[type="range"]:hover::-moz-range-thumb {
-                transform: scale(1.1) !important;
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25), 0 3px 6px rgba(0, 0, 0, 0.15) !important;
-            }
-            
-            /* RGB Specific Sliders - Match exact browser styling */
-            #redSlider::-webkit-slider-thumb {
-                background: linear-gradient(135deg, #FF6B6B, #FF4757) !important;
-                border: none !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-            }
-            
-            #greenSlider::-webkit-slider-thumb {
-                background: linear-gradient(135deg, #51CF66, #26DE81) !important;
-                border: none !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-            }
-            
-            #blueSlider::-webkit-slider-thumb {
-                background: linear-gradient(135deg, #5F9BFF, #4C7BF3) !important;
-                border: none !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-            }
-            
-            #redSlider::-moz-range-thumb {
-                background: linear-gradient(135deg, #FF6B6B, #FF4757) !important;
-                border: none !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-            }
-            
-            #greenSlider::-moz-range-thumb {
-                background: linear-gradient(135deg, #51CF66, #26DE81) !important;
-                border: none !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-            }
-            
-            #blueSlider::-moz-range-thumb {
-                background: linear-gradient(135deg, #5F9BFF, #4C7BF3) !important;
-                border: none !important;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-            }
-            
-            /* Fallback for unsupported slider styling */
-            @supports not (-webkit-appearance: none) {
-                input[type="range"] {
-                    background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)) !important;
-                    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-                    border-radius: 8px !important;
-                    height: 8px !important;
-                }
-            }
-            
-            /* Force re-render for PWA */
-            .pwa-mode input[type="range"] {
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-            
-            .checkbox-label {
-                color: #FFFFFF !important;
-                font-size: 1rem !important;
-            }
-            
-            .checkbox-label input[type="checkbox"] + span {
-                color: #FFFFFF !important;
-            }
-            
-            .collapsible-header {
-                color: #FFFFFF !important;
-                background: rgba(255, 255, 255, 0.05) !important;
-                font-size: 1rem !important;
-                font-weight: 600 !important;
-            }
-            
-            .slider-header span {
-                color: #FFFFFF !important;
-                font-size: 0.9rem !important;
-                font-weight: 500 !important;
-            }
-            
-            .reset-button {
-                background: rgba(124, 58, 237, 0.9) !important;
-                color: #FFFFFF !important;
-                font-size: 0.9rem !important;
-                font-weight: 500 !important;
-            }
-        }
-        
-        /* Fallback styles for older browsers */
-        @supports not (--css: variables) {
-            body { background: #0A0A0B; color: #FFFFFF; }
-            .drawer { background: #141417; }
-            .shape-button { background: #1C1C20; color: #FFFFFF; }
-            .shape { background: white; }
-            input[type="range"] { background: transparent; }
-        }
-        
-        /* Fallback for backdrop-filter */
-        @supports not (backdrop-filter: blur(1px)) {
-            .drawer { background: rgba(20, 20, 23, 0.95) !important; }
-            .app-header::before { background: rgba(255, 255, 255, 0.05) !important; }
-        }
-        
-        /* Fallback for background-clip: text */
-        @supports not (-webkit-background-clip: text) {
-            .app-header h2 { color: #FFFFFF !important; }
-            .control-section label { color: rgba(255, 255, 255, 0.7) !important; }
-        }
-    </style>
-    
-    <!-- Primary favicon and app icons -->
-    <link rel="icon" type="image/png" href="glowframeicon.png">
-    <link rel="apple-touch-icon" href="glowframeicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="glowframeicon.png">
-    
-    <!-- Windows Metro tiles -->
-    <meta name="msapplication-TileImage" content="glowframeicon.png">
-    <meta name="msapplication-TileColor" content="#7C3AED">
-    <meta name="msapplication-config" content="browserconfig.xml">
-    
-    <!-- iOS specific meta tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="GlowFrames">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <!-- Theme colors -->
-    <meta name="theme-color" content="#7C3AED">
-    <meta name="msapplication-navbutton-color" content="#7C3AED">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- PWA splash screens for iOS -->
-    <link rel="apple-touch-startup-image" href="glowframeicon.png">
-    
-    <!-- Open Graph meta tags for social sharing -->
-    <meta property="og:title" content="VisionGlowFrames - Light Box">
-    <meta property="og:description" content="A therapeutic light box app for children with CVI (Cortical Visual Impairment)">
-    <meta property="og:image" content="glowframeicon.png">
-    <meta property="og:url" content="">
-    <meta property="og:type" content="website">
-    
-    <!-- Twitter Card meta tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="VisionGlowFrames - Light Box">
-    <meta name="twitter:description" content="A therapeutic light box app for children with CVI (Cortical Visual Impairment)">
-    <meta name="twitter:image" content="glowframeicon.png">
+    /* Fade-in animation on scroll */
+    .fade-in-section {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-in-section.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* New class to align object-cover images to the top */
+    .object-top {
+      object-position: top;
+    }
+  </style>
 </head>
-<body>
-    <div class="drawer" role="complementary" aria-label="Controls">
-        <div id="drawer-content" class="drawer-inner" aria-hidden="true">
-            <div class="app-header">
-                <img src="glowframeicon.png" alt="GlowFrame" class="app-logo">
-                <h2>Vision Glow Frames</h2>
-            </div>
+<body class="text-slate-700">
 
-            <div class="shape-buttons-container">
-                <button class="shape-button" data-shape="circle">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                    </svg>
-                    Circle
-                </button>
-                <button class="shape-button" data-shape="square">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="4" y="4" width="16" height="16"/>
-                    </svg>
-                    Square
-                </button>
-                <button class="shape-button" id="illuminateFullSurface">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <line x1="3" y1="12" x2="21" y2="12"/>
-                        <line x1="12" y1="3" x2="12" y2="21"/>
-                    </svg>
-                    Full Surface
-                </button>
-            </div>
-
-            <div class="control-section">
-                <label for="ambient">Background Light</label>
-                <input type="range" id="ambient" min="0" max="100" value="0" aria-describedby="ambient-desc">
-                <div id="ambient-desc" class="sr-only">Control the background light intensity from 0 to 100</div>
-                
-                <div style="margin-top: 24px;">
-                    <label for="warmth">Light Warmth</label>
-                    <input type="range" id="warmth" min="0" max="100" value="100" aria-describedby="warmth-desc">
-                    <div id="warmth-desc" class="sr-only">Control the color temperature from cool to warm</div>
-                </div>
-
-                <div style="margin-top: 24px;">
-                    <label for="glowSlider">Shape Glow</label>
-                    <input type="range" id="glowSlider" min="0" max="100" value="0" aria-describedby="glow-desc">
-                    <div id="glow-desc" class="sr-only">Control the glow effect around shapes</div>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <div class="settings-controls">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="fullscreenToggle">
-                        <span>Full Screen</span>
-                    </label>
-                    
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="canvasLock">
-                        <span>Lock Shapes</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="collapsible-section">
-                <button class="collapsible-header">
-                    RGB Controls
-                    <span class="arrow-icon">▼</span>
-                </button>
-                <div class="collapsible-content">
-                    <div class="rgb-controls">
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <span>Red</span>
-                                <span id="redValue">255</span>
-                            </div>
-                            <input type="range" id="redSlider" min="0" max="255" value="255">
-                        </div>
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <span>Green</span>
-                                <span id="greenValue">255</span>
-                            </div>
-                            <input type="range" id="greenSlider" min="0" max="255" value="255">
-                        </div>
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <span>Blue</span>
-                                <span id="blueValue">255</span>
-                            </div>
-                            <input type="range" id="blueSlider" min="0" max="255" value="255">
-                        </div>
-                        <button id="resetRGB" class="reset-button">Reset to White</button>
-                    </div>
-                </div>
-            </div>
+  <!-- Header and Navigation -->
+  <header class="bg-white/90 backdrop-blur-lg sticky top-0 z-40 border-b border-slate-200">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo and Title -->
+        <div class="flex items-center space-x-4">
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">ECVC</h1>
+            <h2 class="text-md font-medium text-blue-600">App Menu</h2>
+          </div>
         </div>
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center space-x-2">
+           <a href="#calculator-apps" class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Calculators</a>
+           <a href="#braille" class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Braille</a>
+           <a href="#single-switch-apps" class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Switch Apps</a>
+           <a href="#assistive-devices" class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Assistive Devices</a>
+           <a href="#microcontroller-devices" class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Microcontrollers</a>
+           <a href="#experimental-projects" class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Experimental</a>
+        </nav>
+        <!-- Mobile Menu Button -->
+        <div class="lg:hidden">
+            <button id="mobile-menu-button" class="p-2 rounded-md text-slate-500 hover:bg-slate-100">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
+        </div>
+      </div>
+      <!-- Mobile Navigation -->
+      <div id="mobile-menu" class="hidden lg:hidden pb-4">
+        <nav class="flex flex-col space-y-2">
+           <a href="#calculator-apps" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Calculators</a>
+           <a href="#braille" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Braille</a>
+           <a href="#single-switch-apps" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Switch Apps</a>
+           <a href="#assistive-devices" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Assistive Devices</a>
+           <a href="#microcontroller-devices" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Microcontrollers</a>
+           <a href="#experimental-projects" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md">Experimental</a>
+        </nav>
+      </div>
     </div>
+  </header>
 
-    <!-- Toggle moved outside drawer to avoid transform/fixed issues and stay viewport-anchored -->
-    <button class="drawer-toggle" aria-expanded="false" aria-controls="drawer-content" aria-label="Toggle menu">☰</button>
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8">
+  
+    <!-- Hero Section -->
+    <section class="text-center py-16 sm:py-24 fade-in-section">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight">
+            Digital Tools for ECVCs
+        </h1>
+        <p class="mt-6 max-w-2xl mx-auto text-lg text-slate-600">
+            Web-based applications and resources by Niall Brown
+        </p>
+        <div class="mt-8 flex justify-center gap-4">
+            <a href="#calculator-apps" class="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30">Explore Apps</a>
+        </div>
+    </section>
 
-    <div id="canvas"></div>
+    <!-- Calculator Apps Section -->
+    <section id="calculator-apps" class="py-12 fade-in-section">
+      <h2 class="text-3xl font-bold text-slate-900 mb-8 border-l-4 border-blue-500 pl-4">Calculator Apps</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- CVI Range Rating II Calculator -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <div class="h-56 w-full flex gap-2 p-2 bg-blue-50">
+             <img class="h-full w-1/2 object-cover object-top rounded-lg clickable-img cursor-pointer" src="cvicalc1.jpg" alt="CVI Calculator Screenshot 1" onerror="this.onerror=null;this.src='https://placehold.co/300x400/e0f2fe/0ea5e9?text=cvicalc1.jpg';">
+             <img class="h-full w-1/2 object-cover rounded-lg clickable-img cursor-pointer" src="cvicalc2.png" alt="CVI Calculator Screenshot 2" onerror="this.onerror=null;this.src='https://placehold.co/300x400/e0f2fe/0ea5e9?text=cvicalc2.png';">
+          </div>
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow">
+              <div class="text-xs inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full mb-2 font-semibold">Calculator</div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">CVI Range Rating II Calculator</h3>
+              <p class="text-slate-600 mb-4">This calculator assists with double-checking assessment totals for the CVI Range Rating II method. This process is based on the work of Dr. Roman-Lantzy.</p>
+            </div>
+            <a href="https://microswitchers.github.io/RangeCalc/" class="mt-4 inline-block bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center">Use the CVI Range Rating II Calculator</a>
+          </div>
+        </div>
+        <!-- Age by Weeks and Category Calculator -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <!-- Replace src with your image path -->
+          <img class="h-56 w-full object-cover object-top clickable-img cursor-pointer" src="agecalc.png" alt="Age by Weeks and Category Calculator Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=agecalc.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow">
+              <div class="text-xs inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full mb-2 font-semibold">Calculator</div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">Age by Weeks & Category Calculator</h3>
+              <p class="text-slate-600 mb-4">A tool for calculating a child's age in weeks, and their age category. The date input has predictive complete, a universal accommodation that speeds up input and accepts multiple date formats.</p>
+            </div>
+            <a href="https://microswitchers.github.io/agebyweekscalc/" class="mt-4 inline-block bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center">Use the Age by Weeks and Category Calculator</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- Polyfills for older browsers -->
-    <script>
-        // Polyfill for Object.assign (IE11 and older mobile browsers)
-        if (typeof Object.assign !== 'function') {
-            Object.assign = function(target) {
-                if (target == null) throw new TypeError('Cannot convert undefined or null to object');
-                var to = Object(target);
-                for (var index = 1; index < arguments.length; index++) {
-                    var nextSource = arguments[index];
-                    if (nextSource != null) {
-                        for (var nextKey in nextSource) {
-                            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                                to[nextKey] = nextSource[nextKey];
-                            }
-                        }
-                    }
-                }
-                return to;
-            };
-        }
-        
-        // Polyfill for CSS custom properties support check
-        if (!window.CSS || !CSS.supports('--css', 'variables')) {
-            document.documentElement.className += ' no-css-vars';
-        }
-        
-        // PWA Detection and Fixes
-        function isPWA() {
-            return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches ||
-                   window.navigator.standalone === true ||
-                   document.referrer.includes('android-app://');
-        }
-        
-        if (isPWA()) {
-            document.documentElement.classList.add('pwa-mode');
-            console.log('Running in PWA mode - applying fixes');
-            
-            // Force style recalculation for PWA
-            setTimeout(() => {
-                const allElements = document.querySelectorAll('*');
-                allElements.forEach(el => {
-                    if (el.style) {
-                        el.style.display = el.style.display || '';
-                    }
-                });
-                
-                // Specific slider fixes
-                const sliders = document.querySelectorAll('input[type="range"]');
-                sliders.forEach(slider => {
-                    // Force re-render of sliders
-                    slider.style.display = 'none';
-                    slider.offsetHeight; // Force reflow
-                    slider.style.display = 'block';
-                    
-                    // Ensure slider properties are set
-                    slider.style.webkitAppearance = 'none';
-                    slider.style.appearance = 'none';
-                    slider.style.background = 'transparent';
-                    slider.style.width = '100%';
-                    slider.style.height = '48px';
-                });
-            }, 100);
-        }
-        
-        // Simple feature detection for modern JS
-        var supportsModernJS = (function() {
-            try {
-                new Function('const a = () => {}');
-                return true;
-            } catch (e) {
-                return false;
-            }
-        })();
-        
-        if (!supportsModernJS) {
-            // Fallback message for very old browsers
-            document.body.innerHTML = '<div style="padding: 20px; background: #0A0A0B; color: white; text-align: center; font-family: Arial, sans-serif;"><h2>Browser Update Required</h2><p>This app requires a modern browser. Please update your browser or try on a different device.</p></div>';
-        }
-    </script>
+    <!-- Braille Section -->
+    <section id="braille" class="py-12 fade-in-section">
+      <h2 class="text-3xl font-bold text-slate-900 mb-8 border-l-4 border-teal-500 pl-4">Braille Apps</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Mechanical Braille Writer Simulator -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="mecbraille.jpg" alt="Mechanical Braille Writer Simulator Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/a7f3d0/0f766e?text=mecbraille.jpg';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow">
+              <div class="text-xs inline-block bg-teal-100 text-teal-800 px-2 py-1 rounded-full mb-2 font-semibold">Braille</div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">Mechanical Braille Writer Simulator</h3>
+              <p class="text-slate-600 mb-4">An interactive simulator for practicing input with a Mechanical Braille Writer. This app emulates the features and limitations of a Braille writer to build muscle memory and conserve paper waste.</p>
+            </div>
+            <a href="https://microswitchers.github.io/braillesim/" class="mt-4 inline-block bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors text-center">Use the Mechanical Braille Writer Simulator</a>
+          </div>
+        </div>
+        <!-- SixKey - Braille Practice Pad -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+           <div class="h-56 w-full flex gap-2 p-2 bg-teal-50">
+             <img class="h-full w-1/2 object-cover rounded-lg clickable-img cursor-pointer" src="sixkey1.jpg" alt="SixKey Practice Pad Screenshot 1" onerror="this.onerror=null;this.src='https://placehold.co/300x400/ccfbf1/14b8a6?text=sixkey1.jpg';">
+             <img class="h-full w-1/2 object-cover rounded-lg clickable-img cursor-pointer" src="sixkey.png" alt="SixKey Practice Pad Screenshot 2" onerror="this.onerror=null;this.src='https://placehold.co/300x400/ccfbf1/14b8a6?text=sixkey.png';">
+          </div>
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow">
+              <div class="text-xs inline-block bg-teal-100 text-teal-800 px-2 py-1 rounded-full mb-2 font-semibold">Braille</div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">SixKey - Braille Practice Pad</h3>
+              <p class="text-slate-600 mb-4">A minimal Braille writing pad for practicing 6 key input with a computer keyboard. Simple controls are provided for Unicode import and export (.txt) format that can be read in any text reader.</p>
+            </div>
+            <a href="https://microswitchers.github.io/sixkey/" class="mt-4 inline-block bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors text-center">Use the SixKey - Braille Practice Pad</a>
+          </div>
+        </div>
+        <!-- BrailleFlex -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="brailleflex.jpg" alt="BrailleFlex Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/a7f3d0/0f766e?text=brailleflex.jpg';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow">
+              <div class="text-xs inline-block bg-teal-100 text-teal-800 px-2 py-1 rounded-full mb-2 font-semibold">Braille</div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">BrailleFlex</h3>
+              <p class="text-slate-600 mb-4">Provides flexible key placement for practicing Braille on a tablet.</p>
+            </div>
+            <a href="https://microswitchers.github.io/BrailleFlex/" class="mt-4 inline-block bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors text-center">Use BrailleFlex</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Single Switch Apps Section -->
+    <section id="single-switch-apps" class="py-12 fade-in-section">
+      <h2 class="text-3xl font-bold text-slate-900 mb-8 border-l-4 border-purple-500 pl-4">Single Switch Apps</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Cause and Effect Fireworks -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="image4.png" alt="Cause and Effect Fireworks Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/f3e8ff/8b5cf6?text=image4.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded-full mb-2 font-semibold">Sensory</div><h3 class="text-xl font-semibold text-slate-900 mb-2">Cause and Effect Fireworks</h3><p class="text-slate-600 mb-4">An interactive app designed to create visual fireworks effects in response to adapted single switch activation.</p></div>
+            <a href="https://microswitchers.github.io/fireworks/" class="mt-4 inline-block bg-purple-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-purple-700 transition-colors text-center">Use Cause and Effect Fireworks</a>
+          </div>
+        </div>
+        <!-- Cause and Effect Ball Drop -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="image6.png" alt="Cause and Effect Ball Drop Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/f3e8ff/8b5cf6?text=image6.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded-full mb-2 font-semibold">Sensory</div><h3 class="text-xl font-semibold text-slate-900 mb-2">Cause and Effect Ball Drop</h3><p class="text-slate-600 mb-4">An app that provides calming, colorful balls that respond to single switch inputs.</p></div>
+            <a href="https://microswitchers.github.io/bouncingballs/" class="mt-4 inline-block bg-purple-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-purple-700 transition-colors text-center">Use Cause and Effect Ball Drop</a>
+          </div>
+        </div>
+        <!-- AstroBounce -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="image9.png" alt="AstroBounce Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/f3e8ff/8b5cf6?text=image9.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded-full mb-2 font-semibold">Sensory</div><h3 class="text-xl font-semibold text-slate-900 mb-2">AstroBounce</h3><p class="text-slate-600 mb-4">A sensory app where users activate a visual sensory experience using a single switch.</p></div>
+            <a href="https://microswitchers.github.io/Astro-Bounce/" class="mt-4 inline-block bg-purple-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-purple-700 transition-colors text-center">Use AstroBounce</a>
+          </div>
+        </div>
+        <!-- HarmonyHopper -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col md:col-span-2">
+          <div class="h-56 w-full flex gap-2 p-2 bg-purple-50">
+             <img class="h-full w-1/2 object-cover rounded-lg clickable-img cursor-pointer" src="image10.png" alt="HarmonyHopper Screenshot 1" onerror="this.onerror=null;this.src='https://placehold.co/300x400/f3e8ff/8b5cf6?text=image10.png';">
+             <img class="h-full w-1/2 object-cover rounded-lg clickable-img cursor-pointer" src="image11.png" alt="HarmonyHopper Screenshot 2" onerror="this.onerror=null;this.src='https://placehold.co/300x400/f3e8ff/8b5cf6?text=image11.png';">
+          </div>
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded-full mb-2 font-semibold">Music</div><h3 class="text-xl font-semibold text-slate-900 mb-2">HarmonyHopper</h3><p class="text-slate-600 mb-4">A music scanning toy controlled by an adapted single switch.</p></div>
+            <a href="https://microswitchers.github.io/HarmonyHopper/" class="mt-4 inline-block bg-purple-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-purple-700 transition-colors text-center">Use HarmonyHopper</a>
+          </div>
+        </div>
+      </div>
+    </section>
     
-    <script src="./script.js?v=1.0.5"></script>
+    <!-- Assistive Devices Section -->
+    <section id="assistive-devices" class="py-12 fade-in-section">
+      <h2 class="text-3xl font-bold text-slate-900 mb-8 border-l-4 border-green-500 pl-4">Assistive Devices</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- GlowFrames -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+           <div class="h-56 w-full flex gap-2 p-2 bg-green-50">
+             <img class="h-full w-1/2 object-cover object-top rounded-lg clickable-img cursor-pointer" src="glowframes.png" alt="GlowFrames Screenshot 1" onerror="this.onerror=null;this.src='https://placehold.co/300x400/dcfce7/22c55e?text=glowframes.png';">
+             <img class="h-full w-1/2 object-cover rounded-lg clickable-img cursor-pointer" src="glowframes2.png" alt="GlowFrames Screenshot 2" onerror="this.onerror=null;this.src='https://placehold.co/300x400/dcfce7/22c55e?text=glowframes2.png';">
+          </div>
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full mb-2 font-semibold">Sensory</div><h3 class="text-xl font-semibold text-slate-900 mb-2">GlowFrames</h3><p class="text-slate-600 mb-4">An app for making a tablet or phone into a light box. Illuminated shapes can be arranged to illuminate translucent materials.</p></div>
+            <a href="https://microswitchers.github.io/GlowFrames/" class="mt-4 inline-block bg-green-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700 transition-colors text-center">Use GlowFrames</a>
+          </div>
+        </div>
+        <!-- Selection Scanner -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="scanning.png" alt="Selection Scanner Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/dcfce7/22c55e?text=scanning.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full mb-2 font-semibold">Scanning</div><h3 class="text-xl font-semibold text-slate-900 mb-2">Selection Scanner</h3><p class="text-slate-600 mb-4">A simple auditory scanning app.</p></div>
+            <a href="https://microswitchers.github.io/selectionscanner/" class="mt-4 inline-block bg-green-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700 transition-colors text-center">Use Selection Scanner</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Microcontroller Devices Section -->
+    <section id="microcontroller-devices" class="py-12 fade-in-section">
+      <h2 class="text-3xl font-bold text-slate-900 mb-8 border-l-4 border-orange-500 pl-4">Microcontroller Devices</h2>
+       <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect">
+        <div class="md:flex">
+          <div class="p-8 flex-1">
+            <div class="text-xs inline-block bg-orange-100 text-orange-800 px-2 py-1 rounded-full mb-2 font-semibold">Hardware</div>
+            <h3 class="text-xl font-semibold text-slate-900 mb-2">3-Function Cause & Effect Single Switch Port</h3>
+            <div class="mb-4 text-slate-600 space-y-2">
+                <p>A microcontroller-based project that offers three different cause-and-effect functions for single switch users.</p>
+                <ul class="list-disc list-inside text-sm pl-2">
+                    <li>Regular Left Mouse Click (click-hold-release)</li>
+                    <li>Direct Left Mouse Click (click-auto release)</li>
+                    <li>Timed Left Mouse Click (click-custom timer- auto release)</li>
+                </ul>
+            </div>
+            <a href="https://github.com/MicroSwitchers/3-Function-Cause-and-Effect-Single-Switch-Port" class="inline-block bg-orange-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-orange-700 transition-colors">Learn More</a>
+          </div>
+          <div class="md:flex-shrink-0 w-full md:w-64 flex items-center justify-center p-4">
+             <img class="h-full w-full object-contain clickable-img cursor-pointer" src="microcontroller.png" alt="Microcontroller Device Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/400x400/ffedd5/f97316?text=microcontroller.png';">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experimental Projects Section -->
+    <section id="experimental-projects" class="py-12 fade-in-section">
+      <h2 class="text-3xl font-bold text-slate-900 mb-8 border-l-4 border-rose-500 pl-4">Experimental Projects</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Assistive Device Activation Tester -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover object-top clickable-img cursor-pointer" src="buttontest.png" alt="Assistive Device Activation Tester Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/ffe4e6/f43f5e?text=buttontest.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-rose-100 text-rose-800 px-2 py-1 rounded-full mb-2 font-semibold">Utility</div><h3 class="text-xl font-semibold text-slate-900 mb-2">Assistive Device Activation Tester</h3><p class="text-slate-600 mb-4">A tool for testing the activation of assistive devices, ensuring they respond correctly to mouse and touch screen inputs.</p></div>
+            <a href="https://microswitchers.github.io/SwitchandButtonTester/" class="mt-4 inline-block bg-rose-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-rose-700 transition-colors text-center">Use the Assistive Device Activation Tester</a>
+          </div>
+        </div>
+        <!-- Appointment Reminder App -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="appointmentreminder.png" alt="Appointment Reminder App Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/ffe4e6/f43f5e?text=appointmentreminder.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow"><div class="text-xs inline-block bg-rose-100 text-rose-800 px-2 py-1 rounded-full mb-2 font-semibold">Utility</div><h3 class="text-xl font-semibold text-slate-900 mb-2">Appointment Reminder App</h3><p class="text-slate-600 mb-4">A visual timer that provides alerts for upcoming appointments. Meant to be left open on a desktop computer to give a persistent visual reminder.</p></div>
+            <a href="https://microswitchers.github.io/AppointmentReminderApp/" class="mt-4 inline-block bg-rose-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-rose-700 transition-colors text-center">Use the Appointment Reminder App</a>
+          </div>
+        </div>
+        <!-- GazeCanvas -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover-effect flex flex-col">
+          <img class="h-56 w-full object-cover clickable-img cursor-pointer" src="image7.png" alt="GazeCanvas App Screenshot" onerror="this.onerror=null;this.src='https://placehold.co/600x400/ffe4e6/f43f5e?text=image7.png';">
+          <div class="p-6 flex-grow flex flex-col">
+            <div class="flex-grow">
+                <div class="text-xs inline-block bg-rose-100 text-rose-800 px-2 py-1 rounded-full mb-2 font-semibold">Gaze Tracking</div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">GazeCanvas</h3>
+                <p class="text-slate-600 mb-4">A minimal image canvas designed to be simple and flexible to import images and text for use with a gaze tracking device overlay. This requires a gaze tracking device with its own overlay software.</p>
+            </div>
+            <div class="mt-4 flex flex-col gap-2">
+                <a href="https://microswitchers.github.io/gazecanvas/" class="block text-center bg-rose-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-rose-700 transition-colors">Use GazeCanvas 1</a>
+                <a href="https://microswitchers.github.io/gazetrakercanvas2/" class="block text-center bg-rose-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-rose-700 transition-colors">Use GazeCanvas 2</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-100 border-t border-slate-200">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-slate-500">
+      <p>Created by Niall Brown - Early Childhood Vision Consultant (ECVC), with assistance from AI.</p>
+      <a href="https://github.com/MicroSwitchers?tab=repositories" class="text-blue-600 hover:text-blue-700 hover:underline">View more on GitHub</a>
+    </div>
+  </footer>
+  
+  <!-- Back-to-Top Button -->
+  <button id="back-to-top" class="hidden fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+    </svg>
+  </button>
+
+  <!-- Image Modal -->
+  <div id="image-modal" class="hidden fixed top-0 left-0 z-50 w-full h-full bg-black/80 flex items-center justify-center">
+    <span id="close-modal" class="absolute top-6 right-8 text-white text-5xl font-bold cursor-pointer">&times;</span>
+    <img id="modal-image" class="max-w-[90%] max-h-[90%]">
+  </div>
+
+  <script>
+    // --- Back to Top Button Logic ---
+    const backToTopButton = document.getElementById('back-to-top');
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTopButton.classList.remove('hidden');
+      } else {
+        backToTopButton.classList.add('hidden');
+      }
+    });
+    
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+
+    // --- Mobile Menu Logic ---
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const navLinks = mobileMenu.querySelectorAll('a');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu when a link is clicked
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+        });
+    });
+    
+    // --- Fade-in on Scroll Logic ---
+    const faders = document.querySelectorAll('.fade-in-section');
+    const appearOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
+    };
+
+    const appearOnScroll = new IntersectionObserver(function(
+        entries,
+        appearOnScroll
+    ) {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+                return;
+            } else {
+                entry.target.classList.add("is-visible");
+                appearOnScroll.unobserve(entry.target);
+            }
+        });
+    },
+    appearOptions);
+
+    faders.forEach(fader => {
+        appearOnScroll.observe(fader);
+    });
+
+    // --- Image Modal Logic ---
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-image');
+    const closeModal = document.getElementById('close-modal');
+    const clickableImages = document.querySelectorAll('.clickable-img');
+
+    clickableImages.forEach(img => {
+        img.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            modalImg.src = img.src;
+        });
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+  </script>
 </body>
 </html>
