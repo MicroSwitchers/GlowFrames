@@ -288,7 +288,102 @@ const BoundingBoxManager = {
             shape.boundingBox.style.top = shape.style.top;
             shape.boundingBox.style.width = shape.style.width;
             shape.boundingBox.style.height = shape.style.height;
+            shape.boundingBox.style.transform = shape.style.transform || 'rotate(0deg)';
         }
+    }
+};
+
+// Gesture Handler for multi-touch
+const GestureHandler = {
+    activeTouches: new Map(),
+
+    handleTouchStart: (shape, e) => {
+        // Track all touches for this shape
+        Array.from(e.touches).forEach(touch => {
+            GestureHandler.activeTouches.set(touch.identifier, {
+                x: touch.clientX,
+                y: touch.clientY,
+                shape: shape
+            });
+        });
+
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            GestureHandler.startGesture(shape, e);
+        }
+    },
+
+    handleTouchMove: (shape, e) => {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            GestureHandler.processGesture(shape, e);
+        }
+    },
+
+    handleTouchEnd: (shape, e) => {
+        // Remove ended touches
+        Array.from(e.changedTouches).forEach(touch => {
+            GestureHandler.activeTouches.delete(touch.identifier);
+        });
+    },
+
+    startGesture: (shape, e) => {
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+
+        // Calculate initial distance for pinch
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        shape.gestureStartDistance = Math.sqrt(dx * dx + dy * dy);
+
+        // Calculate initial angle for rotation
+        shape.gestureStartAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+        // Store initial dimensions
+        shape.gestureStartWidth = parseInt(shape.style.width) || 150;
+        shape.gestureStartHeight = parseInt(shape.style.height) || 150;
+
+        // Store initial rotation
+        const currentTransform = shape.style.transform || '';
+        const rotateMatch = currentTransform.match(/rotate\(([-\d.]+)deg\)/);
+        shape.gestureStartRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
+    },
+
+    processGesture: (shape, e) => {
+        if (!shape.gestureStartDistance) return;
+
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+
+        // Calculate current distance for pinch-to-resize
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        const currentDistance = Math.sqrt(dx * dx + dy * dy);
+        const scale = currentDistance / shape.gestureStartDistance;
+
+        // Calculate current angle for rotation
+        const currentAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+        const rotationDelta = currentAngle - shape.gestureStartAngle;
+        const newRotation = shape.gestureStartRotation + rotationDelta;
+
+        // Apply pinch-to-resize
+        if (shape.classList.contains('circle')) {
+            const newSize = Math.max(shape.gestureStartWidth * scale, 50);
+            shape.style.width = `${newSize}px`;
+            shape.style.height = `${newSize}px`;
+        } else {
+            const newWidth = Math.max(shape.gestureStartWidth * scale, 50);
+            const newHeight = Math.max(shape.gestureStartHeight * scale, 50);
+            shape.style.width = `${newWidth}px`;
+            shape.style.height = `${newHeight}px`;
+        }
+
+        // Apply rotation
+        shape.style.transform = `rotate(${newRotation}deg)`;
+        shape.dataset.rotation = newRotation;
+
+        // Update bounding box
+        BoundingBoxManager.updatePosition(shape);
     }
 };
 
@@ -297,15 +392,15 @@ const ShapeManager = {
     createShape: (event) => {
         return safeExecute(() => {
             if (event.target.id === 'illuminateFullSurface') return;
-            
+
             // Deselect previous shape
             if (AppState.selectedShape) {
                 BoundingBoxManager.hide(AppState.selectedShape);
             }
-        
+
             const shape = document.createElement('div');
             const shapeType = event.target.dataset.shape;
-            
+
             shape.classList.add('shape', shapeType);
             Object.assign(shape.style, {
                 width: '150px',
@@ -313,8 +408,12 @@ const ShapeManager = {
                 position: 'absolute',
                 left: `${window.innerWidth / 2 - 75}px`,
                 top: `${window.innerHeight / 2 - 75}px`,
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                transform: 'rotate(0deg)'
             });
+
+            // Store rotation data
+            shape.dataset.rotation = '0';
 
             // Add accessibility attributes
             shape.setAttribute('role', 'button');
@@ -327,13 +426,13 @@ const ShapeManager = {
             // Create and show bounding box immediately
             const { box, resizeHandle } = BoundingBoxManager.create(shape);
             box.style.display = 'block'; // Ensure box is visible
-            
+
             // Set as selected shape
             AppState.selectedShape = shape;
-            
+
             ShapeManager.setupInteraction(shape);
             ColorManager.updateAllColors();
-            
+
             // Focus the new shape for keyboard interaction
             shape.focus();
             updateGlowSliderState();
@@ -448,6 +547,11 @@ const ShapeManager = {
         shape.addEventListener('pointerdown', onPointerDown);
         shape.addEventListener('keydown', onKeyDown);
         shape.addEventListener('click', handleClick);
+
+        // Add touch gesture support
+        shape.addEventListener('touchstart', (e) => GestureHandler.handleTouchStart(shape, e), { passive: false });
+        shape.addEventListener('touchmove', (e) => GestureHandler.handleTouchMove(shape, e), { passive: false });
+        shape.addEventListener('touchend', (e) => GestureHandler.handleTouchEnd(shape, e));
     }
 };
 
@@ -780,6 +884,63 @@ function setupEventListeners() {
     });
 
     Elements.controls?.glowSlider?.addEventListener('input', updateGlowIntensity);
+
+    // Clear All button - Reset to base defaults
+    const clearAllButton = document.getElementById('clearAll');
+    clearAllButton?.addEventListener('click', () => {
+        if (confirm('Reset app to default settings? This will clear all shapes and reset all controls.')) {
+            // Remove all shapes
+            document.querySelectorAll('.shape').forEach(shape => {
+                if (shape.boundingBox) {
+                    shape.boundingBox.remove();
+                }
+                shape.remove();
+            });
+
+            // Reset all controls to defaults
+            if (Elements.controls.ambient) Elements.controls.ambient.value = 0;
+            if (Elements.controls.warmth) Elements.controls.warmth.value = 100;
+            if (Elements.controls.glowSlider) Elements.controls.glowSlider.value = 0;
+
+            // Reset RGB to white
+            if (Elements.controls.rgb?.red) Elements.controls.rgb.red.value = 255;
+            if (Elements.controls.rgb?.green) Elements.controls.rgb.green.value = 255;
+            if (Elements.controls.rgb?.blue) Elements.controls.rgb.blue.value = 255;
+
+            // Reset RGB display values
+            if (Elements.controls.rgb?.redValue) Elements.controls.rgb.redValue.textContent = '255';
+            if (Elements.controls.rgb?.greenValue) Elements.controls.rgb.greenValue.textContent = '255';
+            if (Elements.controls.rgb?.blueValue) Elements.controls.rgb.blueValue.textContent = '255';
+
+            // Reset base color state
+            AppState.baseColor = [255, 255, 255];
+
+            // Reset checkboxes
+            if (Elements.controls.lockCanvas) Elements.controls.lockCanvas.checked = false;
+            if (Elements.controls.fullscreen && FullscreenManager.isFullscreen()) {
+                FullscreenManager.exit();
+                Elements.controls.fullscreen.checked = false;
+            }
+
+            // Reset full surface state
+            AppState.isFullyIlluminated = false;
+            AppState.previousAmbientValue = 0;
+            Elements.controls.fullSurface?.classList.remove('active');
+
+            // Reset app state
+            AppState.selectedShape = null;
+            AppState.isLocked = false;
+
+            // Update all colors
+            ColorManager.updateAllColors();
+            updateGlowSliderState();
+
+            // Clear saved state
+            localStorage.removeItem('lightboxState');
+
+            announceToScreenReader('App reset to defaults');
+        }
+    });
 }
 
 // Simple toast
@@ -879,10 +1040,15 @@ function initializeApp() {
             window.deferredPrompt = null;
         });
 
-        // Add auto-save
+        // Add auto-save on unload
         window.addEventListener('beforeunload', () => {
             StateManager.saveState();
         });
+
+        // Add periodic auto-save (every 5 seconds)
+        setInterval(() => {
+            StateManager.saveState();
+        }, 5000);
 
     } catch (error) {
         console.error('Initialization failed:', error);
@@ -947,12 +1113,19 @@ const StateManager = {
                     size: {
                         width: shape.style.width,
                         height: shape.style.height
-                    }
+                    },
+                    rotation: shape.dataset.rotation || '0',
+                    color: shape.style.backgroundColor || 'white'
                 })),
                 settings: {
                     ambient: Elements.controls?.ambient?.value ?? 0,
                     warmth: Elements.controls?.warmth?.value ?? 100,
-                    glow: Elements.controls?.glowSlider?.value ?? 0
+                    glow: Elements.controls?.glowSlider?.value ?? 0,
+                    rgb: {
+                        red: Elements.controls?.rgb?.red?.value ?? 255,
+                        green: Elements.controls?.rgb?.green?.value ?? 255,
+                        blue: Elements.controls?.rgb?.blue?.value ?? 255
+                    }
                 }
             };
             localStorage.setItem('lightboxState', JSON.stringify(state));
@@ -967,18 +1140,70 @@ const StateManager = {
             if (saved) {
                 let state = null;
                 try { state = JSON.parse(saved); } catch (e) { console.warn('Bad saved state JSON'); }
+
                 // Restore settings
                 if (state?.settings) {
                     Object.entries(state.settings).forEach(([key, value]) => {
-                        if (Elements.controls && Elements.controls[key]) {
-                        // Special handling for warmth - if it was saved as 0 (old default), use new default of 100
-                        if (key === 'warmth' && value === 0) {
+                        if (key === 'rgb' && Elements.controls?.rgb) {
+                            // Restore RGB values
+                            if (value.red !== undefined) Elements.controls.rgb.red.value = value.red;
+                            if (value.green !== undefined) Elements.controls.rgb.green.value = value.green;
+                            if (value.blue !== undefined) Elements.controls.rgb.blue.value = value.blue;
+
+                            // Update base color state
+                            AppState.baseColor = [
+                                parseInt(value.red ?? 255),
+                                parseInt(value.green ?? 255),
+                                parseInt(value.blue ?? 255)
+                            ];
+                        } else if (Elements.controls && Elements.controls[key]) {
+                            // Special handling for warmth - if it was saved as 0 (old default), use new default of 100
+                            if (key === 'warmth' && value === 0) {
                                 Elements.controls[key].value = 100;
-                        } else {
+                            } else {
                                 Elements.controls[key].value = value;
-                        }
+                            }
                         }
                     });
+                }
+
+                // Restore shapes
+                if (state?.shapes && Array.isArray(state.shapes)) {
+                    state.shapes.forEach(shapeData => {
+                        const shape = document.createElement('div');
+                        const shapeType = shapeData.type || 'circle';
+
+                        shape.classList.add('shape', shapeType);
+                        Object.assign(shape.style, {
+                            width: shapeData.size.width || '150px',
+                            height: shapeData.size.height || '150px',
+                            position: 'absolute',
+                            left: shapeData.position.left || '100px',
+                            top: shapeData.position.top || '100px',
+                            backgroundColor: shapeData.color || 'white',
+                            transform: `rotate(${shapeData.rotation || 0}deg)`
+                        });
+
+                        // Store rotation data
+                        shape.dataset.rotation = shapeData.rotation || '0';
+
+                        // Add accessibility attributes
+                        shape.setAttribute('role', 'button');
+                        shape.setAttribute('tabindex', '0');
+                        shape.setAttribute('aria-label', `${shapeType} light source`);
+                        shape.setAttribute('aria-grabbed', 'false');
+
+                        Elements.canvas.appendChild(shape);
+
+                        // Create bounding box (hidden initially)
+                        BoundingBoxManager.create(shape);
+
+                        // Setup interactions
+                        ShapeManager.setupInteraction(shape);
+                    });
+
+                    // Update glow slider state after restoring shapes
+                    updateGlowSliderState();
                 }
             } else {
                 // No saved state - ensure warmth starts at 100 (warmest)
