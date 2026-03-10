@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fix iOS Icon</title>
+</head>
+<body>
+    <h2>Fix iOS Icon Utility</h2>
+    <p>Loading the current icon, scaling it to remove the padding, adding an opaque background, and preparing an iOS-ready version.</p>
+    <canvas id="c" width="1024" height="1024" style="border:1px solid #ccc; max-width: 300px; display: block; margin-bottom: 20px;"></canvas>
+    <a id="downloadBtn" href="#" download="apple-icon.png" style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">Download Fixed iOS Icon</a>
+
+    <script>
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = 'glowframeicon.png';
+        img.onload = () => {
+            // Background fill (iOS requires opaque, white or black or custom color)
+            ctx.fillStyle = '#000000'; // Or whatever your app's base color is
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            // Draw the original image but scaled up to eliminate the padding
+            // Assuming the visual part of the logo is surrounded by ~20% padding
+            // We draw it larger and centered
+            const sourcePadding = 150; // Pixels to trim from each side depending on actual image size. Change scale if needed.
+            
+            // Just raw scale: draw larger to crop the edges
+            // We want the icon to take up almost the full 1024x1024
+            // e.g. scale up by 1.3x
+            const scale = 1.4;
+            const drawWidth = 1024 * scale;
+            const drawHeight = 1024 * scale;
+            const offsetX = (1024 - drawWidth) / 2;
+            const offsetY = (1024 - drawHeight) / 2;
+
+            ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+
+            const dataURL = canvas.toDataURL('image/png');
+            document.getElementById('downloadBtn').href = dataURL;
+        };
+    </script>
+</body>
+</html>
