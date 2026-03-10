@@ -1,4 +1,4 @@
-/* 
+/*
  * VisionGlowFrames Professional Styles
  * A therapeutic light box app for children with CVI
  */
@@ -31,30 +31,30 @@ textarea {
     --color-surface: #141417;
     --color-surface-light: #1C1C20;
     --color-surface-lighter: #242429;
-    
+
     /* Text Colors */
     --color-text-primary: #FFFFFF;
     --color-text-secondary: rgba(255, 255, 255, 0.7);
     --color-text-tertiary: rgba(255, 255, 255, 0.5);
     --color-text-disabled: rgba(255, 255, 255, 0.3);
-    
+
     /* Brand Colors */
     --color-accent: #7C3AED;
     --color-accent-light: #8B5CF6;
     --color-accent-dark: #6D28D9;
     --color-accent-glow: rgba(124, 58, 237, 0.4);
-    
+
     /* Semantic Colors */
     --color-success: #10B981;
     --color-error: #EF4444;
     --color-warning: #F59E0B;
     --color-info: #3B82F6;
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --gradient-surface: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-light) 100%);
     --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
-    
+
     /* Shadows */
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -62,13 +62,13 @@ textarea {
     --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
     --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6);
     --shadow-glow: 0 0 20px var(--color-accent-glow);
-    
+
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    
+
     /* Spacing */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -76,17 +76,17 @@ textarea {
     --spacing-lg: 24px;
     --spacing-xl: 32px;
     --spacing-2xl: 48px;
-    
+
     /* Border Radius */
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
     --radius-xl: 24px;
     --radius-full: 9999px;
-    
+
     /* Layout */
     --drawer-width: 320px;
-    
+
     /* Dynamic Properties */
     --glow-intensity: 0;
 }
@@ -146,239 +146,255 @@ html {
 
 body {
     height: 100vh;
+    /* iOS Safari fill-available fallback — prevents layout cut-off by browser chrome */
+    height: -webkit-fill-available;
     overflow: hidden;
     touch-action: none;
-    background: var(--color-background);
+    background-color: #0A0A0B;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: var(--color-text-primary);
-    line-height: 1.5;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    /* Fallback colors for browsers without CSS custom properties */
-    background: #0A0A0B;
     color: #FFFFFF;
-    /* Prevent mobile browser zoom/bounce */
-    -webkit-overflow-scrolling: touch;
+    line-height: 1.5;
     overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
     -webkit-touch-callout: none;
     -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Canvas */
 #canvas {
-    width: 100vw;
-    height: 100vh;
-    background: var(--color-background);
-    position: relative;
-    transition: background-color var(--transition-normal);
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0A0A0B;
+    /* background-color controlled by JS — using explicit background-color to avoid shorthand conflicts */
 }
 
-/* Professional Drawer Styles - Alternative Design */
+
+/* ============================================
+   DRAWER
+   ============================================ */
+
 .drawer {
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
     width: var(--drawer-width);
-    /* Fallback background for browsers without backdrop-filter */
     background: rgba(20, 20, 23, 0.95);
-    background: linear-gradient(145deg, 
-        #1A1A1D 0%, 
-        #16161A 25%,
-        #1E1E23 50%,
-        #141418 75%,
-        #0F0F12 100%);
+    background: linear-gradient(170deg,
+        #18181c 0%,
+        #141418 40%,
+        #111114 100%);
     transform: translateX(calc(-1 * var(--drawer-width)));
-    transform: translateX(-320px); /* Fallback for CSS custom properties */
+    transform: translateX(-320px);
     transition: transform var(--transition-normal);
-    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1); /* Fallback */
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
-    box-shadow: 
-        var(--shadow-xl), 
+    box-shadow:
+        var(--shadow-xl),
         0 0 100px rgba(0, 0, 0, 0.6),
-        inset 1px 0 0 rgba(255, 255, 255, 0.05);
-    /* Fallback box-shadow */
+        inset -1px 0 0 rgba(255, 255, 255, 0.04);
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    /* Subtle top accent line */
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Vivid left accent bar */
+.drawer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(124, 58, 237, 0.8) 15%,
+        rgba(139, 92, 246, 1) 50%,
+        rgba(124, 58, 237, 0.8) 85%,
+        transparent 100%);
+    z-index: 1;
+    pointer-events: none;
 }
 
 .drawer.open {
     transform: translateX(0);
 }
 
-/* Drawer Toggle Button */
+/* ============================================
+   DRAWER TOGGLE
+   ============================================ */
+
 .drawer-toggle {
-    position: absolute;
-    right: -48px;
+    /* Default: fixed top-left — overridden by breakpoints for specific sizes */
+    position: fixed;
     top: 20px;
-    /* Grey when drawer is closed */
-    background: rgba(107, 114, 128, 0.9);
-    color: #fff;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    left: 12px;
+    /* Account for iPhone notch / status bar */
+    top: calc(20px + env(safe-area-inset-top));
+    z-index: 1002;
+    background: rgba(30, 30, 36, 0.95);
+    color: rgba(255, 255, 255, 0.8);
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
     transition: all var(--transition-normal);
-    font-size: 20px;
-    font-weight: 500;
+    font-size: 18px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    -webkit-tap-highlight-color: transparent;
+    /* Ensure minimum touch target */
+    min-width: 44px;
+    min-height: 44px;
 }
 
-/* Purple when drawer is open */
 .drawer.open ~ .drawer-toggle {
+    left: calc(var(--drawer-width) + 12px);
     background: rgba(124, 58, 237, 0.9);
-}
-
-/* Override base to viewport-anchored left edge on desktop */
-@media (min-width: 1025px) {
-    .drawer-toggle {
-        position: fixed;
-        top: 20px;
-        /* Give some breathing room from screen edge */
-        left: 12px;
-        right: auto;
-        z-index: 1002;
-        /* Grey when closed */
-        background: rgba(107, 114, 128, 0.9);
-        color: #fff;
-        width: 48px;
-        height: 48px;
-        /* Make it fully round */
-        border-radius: 50%;
-        box-shadow: var(--shadow-md);
-    }
-    
-    /* When drawer opens on desktop, align toggle with drawer's right edge and make purple */
-    .drawer.open ~ .drawer-toggle {
-        left: calc(var(--drawer-width) + 12px); /* 320px + 12px spacing */
-        background: rgba(124, 58, 237, 0.9);
-        /* Keep round shape when open too */
-        border-radius: 50%;
-    }
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
 .drawer-toggle:hover {
-    /* Grey hover state when closed */
-    background: rgba(156, 163, 175, 0.9);
+    background: rgba(50, 50, 60, 0.98);
     color: white;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Purple hover state when drawer is open */
 .drawer.open ~ .drawer-toggle:hover {
-    background: rgba(139, 92, 246, 0.9);
+    background: rgba(139, 92, 246, 0.95);
 }
 
 .drawer-toggle:active {
-    transform: scale(1);
+    transform: translateY(0) scale(0.97);
 }
 
-/* Grey active state when closed */
-.drawer-toggle:active {
-    background: rgba(75, 85, 99, 0.9);
-}
-
-/* Purple active state when drawer is open */
 .drawer.open ~ .drawer-toggle:active {
     background: rgba(109, 40, 217, 0.9);
 }
 
-/* Drawer Content */
+/* ============================================
+   DRAWER INNER CONTENT
+   ============================================ */
+
 .drawer-inner {
     height: 100vh;
-    padding: var(--spacing-lg);
+    height: -webkit-fill-available;
+    padding: 20px var(--spacing-lg) var(--spacing-lg);
+    /* Extra bottom padding for iOS home indicator */
+    padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    position: relative;
+    z-index: 2;
 }
 
 /* Scrollbar Styling */
 .drawer-inner::-webkit-scrollbar {
-    width: 8px;
+    width: 4px;
 }
 
 .drawer-inner::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-sm);
+    background: transparent;
 }
 
 .drawer-inner::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-full);
     transition: background var(--transition-fast);
 }
 
 .drawer-inner::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.22);
 }
 
-/* App Header - Glass Card Style */
+/* ============================================
+   APP HEADER
+   ============================================ */
+
 .app-header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-    padding: var(--spacing-xl) var(--spacing-lg);
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-xl);
-    margin: -var(--spacing-lg) -var(--spacing-lg) var(--spacing-xl) -var(--spacing-lg);
+    gap: 14px;
+    margin-bottom: var(--spacing-lg);
+    padding: 16px;
+    background: linear-gradient(135deg,
+        rgba(124, 58, 237, 0.12) 0%,
+        rgba(30, 30, 40, 0.6) 60%,
+        rgba(124, 58, 237, 0.05) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: var(--radius-lg);
     position: relative;
     overflow: hidden;
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+/* Shine overlay */
 .app-header::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.08) 0%, 
-        transparent 50%,
-        rgba(255, 255, 255, 0.02) 100%);
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(124, 58, 237, 0.6) 30%,
+        rgba(139, 92, 246, 0.9) 50%,
+        rgba(124, 58, 237, 0.6) 70%,
+        transparent 100%);
     pointer-events: none;
 }
 
 .app-logo {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: var(--radius-md);
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.app-header-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
 .app-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.05rem;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    /* Fallback color for browsers without background-clip support */
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin: 0;
     color: #FFFFFF;
-    background: linear-gradient(135deg, 
-        #FFFFFF 0%, 
-        #E0E7FF 50%,
-        #C7D2FE 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #C4B5FD 60%, #A78BFA 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    /* Graceful degradation - only apply transparency if background-clip is supported */
 }
 
-/* Fallback for browsers that don't support background-clip: text */
 @supports not (-webkit-background-clip: text) {
     .app-header h2 {
         color: #FFFFFF !important;
@@ -387,230 +403,333 @@ body {
     }
 }
 
-.app-header-text {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.app-header h2 {
-    line-height: 1.2;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    margin: 0;
-}
-
 .app-author {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.45);
     line-height: 1.3;
     margin: 0;
 }
 
-/* Shape Buttons Container */
-.shape-buttons-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-lg);
-    margin-bottom: var(--spacing-xl);
-}
+/* ============================================
+   SECTION LABELS
+   ============================================ */
 
-/* Professional Button Styles - Neumorphic Design */
-.shape-button {
-    position: relative;
-    padding: var(--spacing-lg) var(--spacing-lg);
-    background: linear-gradient(145deg, #1C1C20 0%, #16161A 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--color-text-primary);
-    border-radius: var(--radius-xl);
+.section-label {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    cursor: pointer;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    transition: all 400ms cubic-bezier(0.23, 1, 0.320, 1);
-    overflow: hidden;
-    box-shadow: 
-        0 8px 16px rgba(0, 0, 0, 0.4),
-        0 2px 4px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    gap: 7px;
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 10px;
+    position: relative;
 }
 
+.section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent);
+    border-radius: 1px;
+}
+
+.section-label svg {
+    flex-shrink: 0;
+    opacity: 0.4;
+}
+
+/* ============================================
+   SHAPE BUTTONS
+   ============================================ */
+
+.shape-buttons-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+}
+
+.shape-button {
+    position: relative;
+    padding: 14px var(--spacing-xs) 12px;
+    background: linear-gradient(160deg, #202026 0%, #18181c 100%);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    transition: all 300ms cubic-bezier(0.23, 1, 0.320, 1);
+    overflow: hidden;
+    min-height: 82px;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.35),
+        0 1px 3px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Subtle gloss overlay */
 .shape-button::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        transparent 50%,
-        rgba(255, 255, 255, 0.02) 100%);
-    opacity: 0;
+    height: 50%;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 100%);
+    pointer-events: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     transition: opacity var(--transition-normal);
 }
 
 .shape-button:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-3px);
-    box-shadow: 
-        0 12px 24px rgba(0, 0, 0, 0.5),
-        0 4px 8px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.shape-button:hover::before {
-    opacity: 1;
+    border-color: rgba(139, 92, 246, 0.35);
+    transform: translateY(-2px);
+    background: linear-gradient(160deg, #26262e 0%, #1e1e24 100%);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(139, 92, 246, 0.15),
+        0 0 20px rgba(124, 58, 237, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .shape-button:active {
-    transform: translateY(0);
-    box-shadow: none;
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 80ms;
 }
 
 .shape-button.active {
-    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-    border: 1px solid rgba(59, 130, 246, 0.5);
-    box-shadow: 
-        0 0 30px rgba(59, 130, 246, 0.4),
-        inset 0 2px 4px rgba(0, 0, 0, 0.2),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #4c1d95 0%, #3730a3 100%);
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    box-shadow:
+        0 0 0 1px rgba(139, 92, 246, 0.3),
+        0 0 24px rgba(124, 58, 237, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 0 12px rgba(124, 58, 237, 0.15);
     transform: translateY(0);
+    color: #fff;
 }
 
 .shape-button svg {
-    width: 20px;
-    height: 20px;
-    opacity: 0.9;
+    width: 26px;
+    height: 26px;
+    opacity: 0.8;
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
 }
 
-/* Control Section */
+.shape-button:hover svg {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.shape-button.active svg {
+    opacity: 1;
+}
+
+/* Shape Button Icon Container */
+.shape-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    transition: background var(--transition-normal), transform var(--transition-normal);
+}
+
+.shape-button:hover .shape-btn-icon {
+    background: rgba(139, 92, 246, 0.15);
+    transform: scale(1.08);
+}
+
+.shape-button.active .shape-btn-icon {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.3);
+}
+
+/* ============================================
+   LIGHT CONTROLS
+   ============================================ */
+
 .control-section {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    background: linear-gradient(160deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    padding: 14px 14px 6px;
 }
 
 .control-section label {
     display: block;
-    font-size: 0.875rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    /* Fallback color for browsers without background-clip support */
-    color: rgba(255, 255, 255, 0.7);
-    background: linear-gradient(135deg, var(--color-text-secondary) 0%, rgba(124, 58, 237, 0.8) 100%);
-    /* Fallback background using CSS custom properties fallback */
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(124, 58, 237, 0.8) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: var(--spacing-sm);
-    margin-bottom: 8px; /* Fallback */
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    position: relative;
+    color: rgba(255, 255, 255, 0.65);
+    background: none;
+    -webkit-text-fill-color: inherit;
+    margin-bottom: 0;
+    letter-spacing: 0.01em;
 }
 
-/* Fallback for browsers that don't support background-clip: text */
 @supports not (-webkit-background-clip: text) {
     .control-section label {
-        color: rgba(255, 255, 255, 0.7) !important;
+        color: rgba(255, 255, 255, 0.65) !important;
         background: none !important;
         -webkit-text-fill-color: inherit !important;
     }
 }
 
-.control-section label::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 24px;
-    height: 2px;
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.6), transparent);
-    border-radius: 1px;
-}
-
 label.disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
-/* Professional Slider Styles */
+/* ============================================
+   SLIDERS
+   ============================================ */
+
 input[type="range"] {
     -webkit-appearance: none;
-    appearance: none; /* Add this line */
+    appearance: none;
     width: 100%;
-    height: 48px;
+    height: 36px;
     background: transparent;
     cursor: pointer;
-    margin: var(--spacing-sm) 0 var(--spacing-lg);
+    margin: 2px 0 10px;
+    touch-action: pan-y; /* Ensure native slider dragging isn't blocked by global touch-action */
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 5px;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.35) var(--fill, 0%),
+        rgba(255, 255, 255, 0.07) var(--fill, 0%)
+    );
     border-radius: var(--radius-full);
-    position: relative;
-    overflow: hidden;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: white;
-    margin-top: -7px;
+    margin-top: -6.5px;
     cursor: pointer;
-    box-shadow: var(--shadow-md);
-    transition: all var(--transition-normal);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.15);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
     position: relative;
     z-index: 2;
 }
 
 input[type="range"]:hover::-webkit-slider-thumb {
     transform: scale(1.2);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 input[type="range"]:active::-webkit-slider-thumb {
     transform: scale(1.1);
 }
 
-/* Firefox Support */
+/* Firefox */
 input[type="range"]::-moz-range-track {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 5px;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.35) var(--fill, 0%),
+        rgba(255, 255, 255, 0.07) var(--fill, 0%)
+    );
     border-radius: var(--radius-full);
 }
 
 input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: none;
     border-radius: 50%;
     background: white;
     cursor: pointer;
-    box-shadow: var(--shadow-md);
-    transition: all var(--transition-normal);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.15);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-/* RGB Slider Specific Styles */
+/* RGB Slider Tracks */
+#redSlider::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        rgba(239, 68, 68, 0.7) var(--fill, 100%),
+        rgba(239, 68, 68, 0.12) var(--fill, 100%)
+    );
+}
+
+#greenSlider::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        rgba(34, 197, 94, 0.7) var(--fill, 100%),
+        rgba(34, 197, 94, 0.12) var(--fill, 100%)
+    );
+}
+
+#blueSlider::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        rgba(59, 130, 246, 0.7) var(--fill, 100%),
+        rgba(59, 130, 246, 0.12) var(--fill, 100%)
+    );
+}
+
+#redSlider::-moz-range-track {
+    background: linear-gradient(
+        to right,
+        rgba(239, 68, 68, 0.7) var(--fill, 100%),
+        rgba(239, 68, 68, 0.12) var(--fill, 100%)
+    );
+}
+
+#greenSlider::-moz-range-track {
+    background: linear-gradient(
+        to right,
+        rgba(34, 197, 94, 0.7) var(--fill, 100%),
+        rgba(34, 197, 94, 0.12) var(--fill, 100%)
+    );
+}
+
+#blueSlider::-moz-range-track {
+    background: linear-gradient(
+        to right,
+        rgba(59, 130, 246, 0.7) var(--fill, 100%),
+        rgba(59, 130, 246, 0.12) var(--fill, 100%)
+    );
+}
+
+/* RGB Slider Thumb Colors */
 #redSlider::-webkit-slider-thumb {
     background: linear-gradient(135deg, #FF6B6B, #FF4757);
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.5), 0 0 0 2px rgba(255, 107, 107, 0.2);
 }
 
 #greenSlider::-webkit-slider-thumb {
     background: linear-gradient(135deg, #51CF66, #26DE81);
+    box-shadow: 0 2px 8px rgba(38, 222, 129, 0.5), 0 0 0 2px rgba(81, 207, 102, 0.2);
 }
 
 #blueSlider::-webkit-slider-thumb {
     background: linear-gradient(135deg, #5F9BFF, #4C7BF3);
+    box-shadow: 0 2px 8px rgba(76, 123, 243, 0.5), 0 0 0 2px rgba(95, 155, 255, 0.2);
 }
 
 #redSlider::-moz-range-thumb {
@@ -627,7 +746,7 @@ input[type="range"]::-moz-range-thumb {
 
 /* Disabled Slider */
 input[type="range"]:disabled {
-    opacity: 0.3;
+    opacity: 0.25;
     cursor: not-allowed;
 }
 
@@ -635,17 +754,70 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     cursor: not-allowed;
 }
 
-/* Settings Section */
+/* ============================================
+   SLIDER GROUP ITEMS
+   ============================================ */
+
+.slider-group-item {
+    position: relative;
+}
+
+.slider-group-item + .slider-group-item {
+    margin-top: 0;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.slider-group-item input[type="range"] {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Slider Label Row */
+.slider-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.slider-label-row label {
+    margin-bottom: 0;
+}
+
+/* Slider Value Badge */
+.slider-val {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    padding: 1px 7px;
+    border-radius: var(--radius-full);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    transition: color var(--transition-fast);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 36px;
+    text-align: center;
+}
+
+/* ============================================
+   SETTINGS SECTION
+   ============================================ */
+
 .settings-section {
-    padding: var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(139, 92, 246, 0.02) 100%);
-    border: 1px solid rgba(124, 58, 237, 0.15);
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(30, 30, 40, 0.4) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.12);
     border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
     position: relative;
     overflow: hidden;
 }
 
+/* Top glow line */
 .settings-section::before {
     content: '';
     position: absolute;
@@ -653,22 +825,25 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.4), transparent);
+    background: linear-gradient(90deg, transparent 0%, rgba(124, 58, 237, 0.5) 50%, transparent 100%);
 }
 
 .settings-controls {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: 8px;
 }
 
-/* Professional Checkbox Styles */
+/* ============================================
+   CHECKBOX / TOGGLE LABELS
+   ============================================ */
+
 .checkbox-label {
     display: flex;
     align-items: center;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: linear-gradient(135deg, var(--color-surface-light) 0%, var(--color-surface-lighter) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.015) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-normal);
@@ -683,92 +858,138 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(139, 92, 246, 0.05));
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(139, 92, 246, 0.04));
     opacity: 0;
     transition: opacity var(--transition-normal);
 }
 
 .checkbox-label:hover {
-    background: linear-gradient(135deg, var(--color-surface-lighter) 0%, rgba(124, 58, 237, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(124, 58, 237, 0.06) 100%);
     border-color: rgba(124, 58, 237, 0.2);
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.1);
+    box-shadow: 0 0 16px rgba(124, 58, 237, 0.08);
 }
 
+.checkbox-label:hover::before {
+    opacity: 1;
+}
+
+/* Hide the native checkbox — visual toggle is done via .toggle-track */
 .checkbox-label input[type="checkbox"] {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    margin-right: var(--spacing-md);
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-full);
-    transition: all var(--transition-normal);
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
 }
 
-.checkbox-label input[type="checkbox"]::after {
+/* The visual pill toggle — works cross-browser including iOS Safari */
+.toggle-track {
+    position: relative;
+    display: inline-flex;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* The knob — a sibling span, fully supported on iOS Safari */
+.toggle-track::after {
     content: '';
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     background: white;
     border-radius: 50%;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
     transition: all var(--transition-normal);
 }
 
-.checkbox-label input[type="checkbox"]:checked {
-    background: var(--gradient-accent);
+.checkbox-label input[type="checkbox"]:checked + .toggle-track {
+    background: linear-gradient(135deg, #7C3AED, #6D28D9);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.4);
 }
 
-.checkbox-label input[type="checkbox"]:checked::after {
-    transform: translateX(20px);
+.checkbox-label input[type="checkbox"]:checked + .toggle-track::after {
+    transform: translateX(18px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .checkbox-label span {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
     position: relative;
     z-index: 1;
 }
 
-/* Clear All Button */
+/* ============================================
+   CLEAR ALL BUTTON
+   ============================================ */
+
 .clear-all-button {
     width: 100%;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #FCA5A5;
+    padding: 11px var(--spacing-md);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.04) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    color: rgba(252, 165, 165, 0.9);
     border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     transition: all var(--transition-normal);
-    margin-top: var(--spacing-md);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    position: relative;
+    overflow: hidden;
+}
+
+.clear-all-button::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.08));
+    opacity: 0;
+    transition: opacity var(--transition-normal);
 }
 
 .clear-all-button:hover {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.1) 100%);
-    border-color: rgba(239, 68, 68, 0.5);
+    border-color: rgba(239, 68, 68, 0.45);
     color: #FEE2E2;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.clear-all-button:hover::before {
+    opacity: 1;
 }
 
 .clear-all-button:active {
     transform: scale(0.98);
+    transition: all 80ms;
 }
 
-/* RGB Controls Section */
+/* ============================================
+   COLOUR CONTROLS (COLLAPSIBLE)
+   ============================================ */
+
 .collapsible-section {
     margin-top: auto;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, var(--color-surface-light) 50%, rgba(139, 92, 246, 0.03) 100%);
+    background: linear-gradient(160deg,
+        rgba(124, 58, 237, 0.07) 0%,
+        rgba(20, 20, 28, 0.8) 50%,
+        rgba(139, 92, 246, 0.03) 100%);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    border: 1px solid rgba(124, 58, 237, 0.2);
-    box-shadow: 0 0 30px rgba(124, 58, 237, 0.05);
+    border: 1px solid rgba(124, 58, 237, 0.18);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 40px rgba(124, 58, 237, 0.04);
     position: relative;
 }
 
@@ -779,34 +1000,43 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.6), transparent);
+    background: linear-gradient(90deg, transparent 0%, rgba(124, 58, 237, 0.7) 50%, transparent 100%);
 }
 
 .collapsible-header {
     width: 100%;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: 14px 16px;
     background: transparent;
     color: var(--color-text-primary);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.9375rem;
-    font-weight: 500;
+    font-size: 0.875rem;
+    font-weight: 600;
     transition: all var(--transition-normal);
+    letter-spacing: 0.01em;
 }
 
 .collapsible-header:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.collapsible-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .arrow-icon {
     transition: transform var(--transition-normal);
-    opacity: 0.7;
+    opacity: 0.5;
+    font-size: 0.75rem;
 }
 
 .collapsible-section.open .arrow-icon {
     transform: rotate(180deg);
+    opacity: 0.8;
 }
 
 .collapsible-content {
@@ -816,51 +1046,79 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     background: rgba(0, 0, 0, 0.2);
 }
 
+/* ============================================
+   RGB CONTROLS
+   ============================================ */
+
 .rgb-controls {
-    padding: var(--spacing-lg);
+    padding: 14px 16px 16px;
 }
 
 .slider-group {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: 12px;
+}
+
+.slider-group:last-of-type {
+    margin-bottom: 14px;
 }
 
 .slider-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: var(--spacing-sm);
-    font-size: 0.875rem;
+    margin-bottom: 2px;
+    font-size: 0.8rem;
 }
 
 .slider-header span:first-child {
     font-weight: 500;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.55);
 }
 
 .slider-header span:last-child {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-text-primary);
     font-variant-numeric: tabular-nums;
 }
 
 .reset-button {
     width: 100%;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--color-surface-lighter);
+    padding: 9px var(--spacing-md);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    color: var(--color-text-primary);
+    color: rgba(255, 255, 255, 0.65);
     border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     transition: all var(--transition-normal);
+    letter-spacing: 0.01em;
 }
 
 .reset-button:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.85);
 }
 
-/* Shape Styles */
+/* ============================================
+   LIVE COLOR SWATCH
+   ============================================ */
+
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgb(255, 255, 255);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0,0,0,0.2);
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/* ============================================
+   SHAPE STYLES (CANVAS ELEMENTS)
+   ============================================ */
+
 .shape {
     position: absolute;
     cursor: move;
@@ -868,11 +1126,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     user-select: none;
     transform-origin: center center;
     will-change: transform, left, top, width, height;
-    transition: box-shadow var(--transition-normal);
+    /* Removed transition: box-shadow so glow slider creates no input lag */
     background: white;
-    z-index: 10; /* Ensure shapes stay above canvas */
+    z-index: 10;
 
-    /* Professional Glow Effect */
     box-shadow:
         0 0 20px rgba(var(--shape-color, 255, 255, 255), calc(0.9 * var(--glow-intensity))),
         0 0 40px rgba(var(--shape-color, 255, 255, 255), calc(0.7 * var(--glow-intensity))),
@@ -880,10 +1137,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
         0 0 120px rgba(var(--shape-color, 255, 255, 255), calc(0.3 * var(--glow-intensity))),
         0 0 200px rgba(var(--shape-color, 255, 255, 255), calc(0.15 * var(--glow-intensity)));
 }
+
 .shape.dragging { transition: none !important; }
 .shape.dragging {
-    /* Reduce glow while dragging to improve performance on low-end devices */
-    box-shadow: 
+    box-shadow:
         0 0 10px rgba(var(--shape-color, 255, 255, 255), calc(0.5 * var(--glow-intensity))),
         0 0 20px rgba(var(--shape-color, 255, 255, 255), calc(0.35 * var(--glow-intensity)));
 }
@@ -905,7 +1162,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     outline: none;
 }
 
-/* Bounding Box */
+/* ============================================
+   BOUNDING BOX
+   ============================================ */
+
 .bounding-box {
     position: absolute;
     border: 2px solid var(--color-accent);
@@ -919,6 +1179,7 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     will-change: transform, left, top, width, height;
     transform-origin: center center;
 }
+
 .bounding-box.dragging { transition: none !important; animation: none !important; }
 
 @keyframes pulse {
@@ -940,7 +1201,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     border-radius: var(--radius-lg);
 }
 
-/* Delete Button */
+/* ============================================
+   DELETE BUTTON
+   ============================================ */
+
 .delete-button {
     position: absolute;
     top: -16px;
@@ -972,7 +1236,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     transform: scale(1);
 }
 
-/* Resize Handle */
+/* ============================================
+   RESIZE HANDLE
+   ============================================ */
+
 .resize-handle {
     position: absolute;
     width: 24px;
@@ -1001,7 +1268,46 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     transform: scale(1.1);
 }
 
-/* Accessibility */
+/* ============================================
+   TOAST
+   ============================================ */
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--color-surface-lighter);
+    color: var(--color-text-primary);
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+    z-index: 2000;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.toast button {
+    background: var(--color-accent);
+    color: white;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
 .sr-only {
     position: absolute;
     width: 1px;
@@ -1014,86 +1320,42 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     border-width: 0;
 }
 
-/* Responsive Design Breakpoints */
+/* ============================================
+   RESPONSIVE — TABLET / SMALL LAPTOP
+   ============================================ */
 
-/* Tablet and small laptop - use same left handle */
 @media (max-width: 1024px) {
     .drawer-toggle {
-        position: fixed !important;
-        top: 20px !important;
-        left: 12px !important;
-        right: auto !important;
-        z-index: 1002 !important;
-        transform: none !important;
-        /* Grey when closed */
-        background: rgba(107, 114, 128, 0.9) !important;
-        border-radius: 50% !important;
-        width: 60px !important;
-        height: 60px !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-    }
-    
-    .drawer.open ~ .drawer-toggle {
-        position: fixed !important;
-        left: calc(var(--drawer-width) + 12px) !important; /* Drawer edge + spacing */
-        /* Purple when open */
-        background: rgba(124, 58, 237, 0.9) !important;
-        z-index: 1002 !important;
-        transform: none !important;
+        width: 48px !important;
+        height: 48px !important;
     }
 }
 
 @media (max-width: 768px) {
     :root {
-        --drawer-width: 280px; /* Smaller but still usable on tablets */
+        --drawer-width: 280px;
     }
-    
+
     .drawer {
         width: var(--drawer-width);
-        /* Keep standard left-side behavior */
         transform: translateX(calc(-1 * var(--drawer-width)));
     }
-    
+
     .drawer.open {
         transform: translateX(0);
     }
-    
+
     .drawer-toggle {
-        position: fixed !important;
-        top: 20px !important;
-        left: 12px !important;
-        right: auto !important;
-        z-index: 1002 !important;
-        /* Grey when closed */
-        background: rgba(107, 114, 128, 0.9) !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 50% !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-        width: 60px !important;
-        height: 60px !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
-        transform: none !important;
+        width: 48px !important;
+        height: 48px !important;
     }
-    
-    /* Ensure toggle stays visible even when drawer is open */
-    .drawer.open ~ .drawer-toggle {
-        position: fixed !important;
-        left: calc(var(--drawer-width) + 12px) !important; /* 280px + 12px spacing */
-        /* Purple when open */
-        background: rgba(124, 58, 237, 0.9) !important;
-        z-index: 1002 !important;
-        transform: none !important;
-    }
-    
+
     .app-header h2 {
-        font-size: 1.25rem;
+        font-size: 1rem;
     }
-    
+
     .shape-button {
         padding: var(--spacing-md);
-        padding: 16px; /* Fallback */
     }
 }
 
@@ -1101,188 +1363,121 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     :root {
         --spacing-md: 12px;
         --spacing-lg: 18px;
+        --drawer-width: 240px;
     }
-    
+
     .control-section label {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
-    
-    .rgb-controls .slider-group {
-        gap: var(--spacing-sm);
-    }
-    
+
     .drawer-inner {
         padding: var(--spacing-md);
+        padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
     }
-    
-    /* Apply same left-drawer approach for small phones */
-    .drawer {
-        width: 240px !important; /* Even smaller for phones but still usable */
-    }
-    
-    .drawer.open {
-        transform: translateX(0) !important;
-    }
-    
-    .drawer:not(.open) {
-        transform: translateX(-240px) !important;
-    }
-    
+
     .drawer-toggle {
-        position: fixed !important;
-        top: 20px !important;
         left: 10px !important;
-        right: auto !important;
-        z-index: 1002 !important;
-        width: 50px !important;
-        height: 50px !important;
-        border-radius: 50% !important;
-        /* Grey when closed */
-        background: rgba(107, 114, 128, 0.9) !important;
-        transform: none !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-    }
-    
-    .drawer.open ~ .drawer-toggle {
-        position: fixed !important;
-        left: calc(240px + 10px) !important; /* 240px drawer + 10px spacing */
-        /* Purple when open */
-        background: rgba(124, 58, 237, 0.9) !important;
-        z-index: 1002 !important;
-        transform: none !important;
     }
 }
 
-/* Landscape Mobile Devices */
+/* Landscape Mobile */
 @media (max-height: 500px) and (orientation: landscape) {
     .drawer {
         height: 100vh;
+        height: -webkit-fill-available;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
-    
+
     .drawer-toggle {
-        position: fixed !important;
-        top: 12px !important;
+        top: 8px !important;
+        top: calc(8px + env(safe-area-inset-top)) !important;
         left: 10px !important;
-        right: auto !important;
-        z-index: 1002 !important;
-        /* Consistent grey when closed */
-        background: rgba(107, 114, 128, 0.9) !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 50% !important;
-        width: 48px !important;
-        height: 48px !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-        transform: none !important;
-    }
-    
-    /* Purple when drawer is open in landscape */
-    .drawer.open ~ .drawer-toggle {
-        background: rgba(124, 58, 237, 0.9) !important;
-        left: calc(var(--drawer-width) + 10px) !important;
+        width: 40px !important;
+        height: 40px !important;
     }
 }
 
-/* Touch Device Optimizations */
+/* Touch Devices (iOS, Android) */
 @media (hover: none) and (pointer: coarse) {
     :root {
-        --drawer-width: 340px;
+        --drawer-width: 300px;
     }
-    
+
     .drawer-toggle {
-        position: fixed !important;
-        top: 16px !important;
-        left: 12px !important;
-        right: auto !important;
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 24px;
-        z-index: 1002 !important;
-        /* Consistent grey when closed */
-        background: rgba(107, 114, 128, 0.9) !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 50% !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-        transform: none !important;
-        /* Ensure minimum touch target size */
-        min-width: 44px;
-        min-height: 44px;
+        /* Account for notch on iOS — safe area fallback already in base */
+        top: calc(16px + env(safe-area-inset-top)) !important;
+        width: 52px !important;
+        height: 52px !important;
     }
-    
-    /* Purple when drawer is open on touch devices */
-    .drawer.open ~ .drawer-toggle {
-        background: rgba(124, 58, 237, 0.9) !important;
-        left: calc(var(--drawer-width) + 12px) !important;
-    }
-    
+
     .shape-button {
-        padding: var(--spacing-lg);
-        padding: 24px; /* Fallback */
+        padding: 24px;
         font-size: 1rem;
-        /* Ensure minimum touch target size */
         min-height: 44px;
     }
-    
+
     .checkbox-label {
-        padding: var(--spacing-lg);
-        padding: 24px; /* Fallback */
-        /* Ensure minimum touch target size */
+        padding: 18px 14px;
         min-height: 44px;
     }
-    
+
     input[type="range"] {
-        height: 56px;
-        /* Larger touch targets for mobile */
+        height: 52px;
         min-height: 44px;
     }
-    
+
+    input[type="range"]::-webkit-slider-runnable-track {
+        height: 6px;
+    }
+
+    input[type="range"]::-moz-range-track {
+        height: 6px;
+    }
+
     input[type="range"]::-webkit-slider-thumb {
-        width: 28px;
-        height: 28px;
-        margin-top: -11px;
+        width: 32px;
+        height: 32px;
+        margin-top: -13px;
     }
-    
+
     input[type="range"]::-moz-range-thumb {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
     }
-    
+
     .delete-button {
         width: 40px;
         height: 40px;
         top: -20px;
         right: -20px;
         font-size: 22px;
-        /* Ensure minimum touch target size */
         min-width: 44px;
         min-height: 44px;
     }
-    
+
     .resize-handle {
         width: 36px;
         height: 36px;
         bottom: -18px;
         right: -18px;
-        /* Ensure minimum touch target size */
         min-width: 44px;
         min-height: 44px;
     }
-    
-    /* Prevent accidental zoom on double tap */
+
     * {
         touch-action: manipulation;
     }
-    
-    /* Better touch feedback */
+
+    /* Sliders need pan-y to be draggable on iOS — override the * rule above */
+    input[type="range"] {
+        touch-action: pan-y !important;
+    }
+
     .shape-button:active,
     .checkbox-label:active,
     .drawer-toggle:active {
-        transform: scale(0.98);
+        transform: scale(0.97);
     }
 }
 
@@ -1302,17 +1497,17 @@ input[type="range"]:disabled::-webkit-slider-thumb {
         --color-accent-light: #A855F7;
         --color-accent-dark: #7C3AED;
     }
-    
+
     .shape {
         border: 2px solid white;
     }
-    
+
     .bounding-box {
         border-width: 3px;
     }
 }
 
-/* Dark Mode Adjustments */
+/* Light Mode Adjustments */
 @media (prefers-color-scheme: light) {
     :root {
         --color-background: #FAFAFA;
@@ -1323,43 +1518,12 @@ input[type="range"]:disabled::-webkit-slider-thumb {
         --color-text-secondary: rgba(0, 0, 0, 0.7);
         --color-text-tertiary: rgba(0, 0, 0, 0.5);
     }
-    
+
     .drawer {
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
     }
-    
+
     .shape {
         background: #1A1A1A;
     }
-}
-
-/* Toast (update notifications) */
-.toast {
-    position: fixed;
-    left: 50%;
-    bottom: 20px;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--color-surface-lighter);
-    color: var(--color-text-primary);
-    padding: 10px 14px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--transition-normal), transform var(--transition-normal);
-    z-index: 2000;
-}
-.toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-}
-.toast button {
-    background: var(--color-accent);
-    color: white;
-    padding: 6px 10px;
-    border-radius: var(--radius-sm);
 }

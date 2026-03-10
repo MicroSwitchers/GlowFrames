@@ -77,7 +77,8 @@ const Elements = {
             reset: document.getElementById('resetRGB')
         },
         glowSlider: document.getElementById('glowSlider'),
-        glowValue: document.getElementById('glowValue')
+        glowValue: document.getElementById('glowValue'),
+        shapeBrightness: document.getElementById('shapeBrightness')
     },
     shapes: document.getElementsByClassName('shape')  // Use getElementsByClassName instead of querySelectorAll
 };
@@ -118,22 +119,26 @@ const ColorManager = {
     updateAllColors: () => {
         const warmth = Elements.controls.warmth.value;
         const ambient = Elements.controls.ambient.value;
-        
+
         // Get base RGB color
         const baseRGB = [
             parseInt(Elements.controls.rgb.red.value),
             parseInt(Elements.controls.rgb.green.value),
             parseInt(Elements.controls.rgb.blue.value)
         ];
-        
+
         // Apply warmth to the base color
         const warmColor = ColorManager.updateWarmColor(warmth, baseRGB);
 
+        // Apply shape brightness
+        const brightness = parseInt(Elements.controls.shapeBrightness?.value ?? 100);
+        const shapeColor = warmColor.map(c => Math.round(c * (brightness / 100)));
+
         // Update shapes with color and CSS variable for glow
         document.querySelectorAll('.shape').forEach(shape => {
-            shape.style.backgroundColor = `rgb(${warmColor.join(',')})`;
+            shape.style.backgroundColor = `rgb(${shapeColor.join(',')})`;
             // Set CSS variable for glow color
-            shape.style.setProperty('--shape-color', warmColor.join(','));
+            shape.style.setProperty('--shape-color', shapeColor.join(','));
         });
 
         // Update background
@@ -227,13 +232,10 @@ const BoundingBoxManager = {
         const onPointerUp = (e) => {
             if (!isResizing) return;
             isResizing = false;
-            
+
             document.removeEventListener('pointermove', onPointerMove);
             document.removeEventListener('pointerup', onPointerUp);
             document.removeEventListener('pointercancel', onPointerUp);
-            
-            BoundingBoxManager.hide(shape);
-            AppState.selectedShape = null;
         };
 
         const onPointerDown = (e) => {
@@ -391,7 +393,8 @@ const GestureHandler = {
 const ShapeManager = {
     createShape: (event) => {
         return safeExecute(() => {
-            if (event.target.id === 'illuminateFullSurface') return;
+            const button = event.currentTarget;
+            if (button.id === 'illuminateFullSurface') return;
 
             // Deselect previous shape
             if (AppState.selectedShape) {
@@ -399,7 +402,7 @@ const ShapeManager = {
             }
 
             const shape = document.createElement('div');
-            const shapeType = event.target.dataset.shape;
+            const shapeType = button.dataset.shape;
 
             shape.classList.add('shape', shapeType);
             Object.assign(shape.style, {
@@ -628,7 +631,11 @@ function setupRGBControls() {
         Elements.controls.rgb.greenValue.textContent = AppState.baseColor[1];
         Elements.controls.rgb.blueValue.textContent = AppState.baseColor[2];
 
-        debouncedColorUpdate();
+        updateSliderFill(Elements.controls.rgb.red);
+        updateSliderFill(Elements.controls.rgb.green);
+        updateSliderFill(Elements.controls.rgb.blue);
+        updateColorSwatch();
+        throttledColorUpdate();
     };
 
     // RGB slider listeners
@@ -694,20 +701,48 @@ function validateNumericInput(value, min, max, defaultValue) {
 }
 
 // Add utility functions
-function debounce(func, wait) {
-    let timeout;
+function throttle(func) {
+    let isWaiting = false;
     return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        if (!isWaiting) {
+            isWaiting = true;
+            requestAnimationFrame(() => {
+                func(...args);
+                isWaiting = false;
+            });
+        }
     };
 }
 
+// UI utility: update slider fill track via CSS custom property
+function updateSliderFill(slider) {
+    if (!slider) return;
+    const min = parseFloat(slider.min) || 0;
+    const max = parseFloat(slider.max) || 100;
+    const pct = ((parseFloat(slider.value) - min) / (max - min)) * 100;
+    slider.style.setProperty('--fill', `${pct.toFixed(1)}%`);
+}
+
+// UI utility: update value display badge
+function setSliderDisplay(displayId, value, max) {
+    const el = document.getElementById(displayId);
+    if (!el) return;
+    el.textContent = max === 100 ? `${Math.round(value)}%` : Math.round(value);
+}
+
+// UI utility: update the live color swatch in the RGB header
+function updateColorSwatch() {
+    const swatch = document.getElementById('colorSwatchPreview');
+    if (!swatch) return;
+    const r = Elements.controls.rgb.red?.value ?? 255;
+    const g = Elements.controls.rgb.green?.value ?? 255;
+    const b = Elements.controls.rgb.blue?.value ?? 255;
+    swatch.style.background = `rgb(${r}, ${g}, ${b})`;
+    swatch.style.boxShadow = `0 2px 8px rgba(${r}, ${g}, ${b}, 0.4)`;
+}
+
 // Add debouncing for intensive operations
-const debouncedColorUpdate = debounce(ColorManager.updateAllColors, 16);
+const throttledColorUpdate = throttle(ColorManager.updateAllColors);
 
 // Add cleanup function for shape removal
 function removeShape(shape) {
@@ -734,8 +769,6 @@ function setupEventListeners() {
         Elements.drawer.classList.add('open');
         Elements.drawerToggle.setAttribute('aria-expanded', 'true');
         Elements.drawerContent?.setAttribute('aria-hidden', 'false');
-        // Hide all shape controls when drawer opens
-        document.querySelectorAll('.shape').forEach(shape => BoundingBoxManager.hide(shape));
         // Move focus to first focusable control inside drawer for accessibility
         const firstFocusable = Elements.drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
         if (firstFocusable) {
@@ -758,6 +791,7 @@ function setupEventListeners() {
             openDrawer();
         }
     };
+
 
     // Toggle interactions
     Elements.drawerToggle?.addEventListener('click', toggleDrawer);
@@ -786,30 +820,42 @@ function setupEventListeners() {
         }
     });
 
-    // Close on outside click (but ignore clicks on the toggle button)
-    document.addEventListener('click', (e) => {
-        if (!Elements.drawer.classList.contains('open')) return;
-        const target = e.target;
-        if (!(target instanceof Element)) return;
-        const clickedInsideDrawer = target.closest('.drawer');
-        const clickedToggle = target.closest('.drawer-toggle');
-        if (!clickedInsideDrawer && !clickedToggle) {
-            closeDrawer();
-        }
-    });
 
     // Shape creation
     document.querySelectorAll('.shape-button').forEach(button => 
         button.addEventListener('click', ShapeManager.createShape));
 
     // Controls
-    Elements.controls.warmth.addEventListener('input', debouncedColorUpdate);
+    Elements.controls.warmth.addEventListener('input', (e) => {
+        updateSliderFill(e.target);
+        setSliderDisplay('warmthDisplay', e.target.value, 100);
+        throttledColorUpdate();
+    });
     Elements.controls.ambient.addEventListener('input', (e) => {
-        // If not in Full Surface mode, update the previous value so it can be restored later
-        if (!AppState.isFullyIlluminated) {
-            AppState.previousAmbientValue = e.target.value;
+        updateSliderFill(e.target);
+        setSliderDisplay('ambientDisplay', e.target.value, 100);
+        // If user moves slider while Full is active, deactivate the button
+        if (AppState.isFullyIlluminated) {
+            AppState.isFullyIlluminated = false;
+            Elements.controls.fullSurface.classList.remove('active');
         }
-        debouncedColorUpdate();
+        AppState.previousAmbientValue = e.target.value;
+        // Shape brightness can never be less than background brightness
+        const ambientVal = parseInt(e.target.value);
+        const sb = Elements.controls.shapeBrightness;
+        if (sb && parseInt(sb.value) < ambientVal) {
+            sb.value = ambientVal;
+            updateSliderFill(sb);
+            setSliderDisplay('shapeBrightnessDisplay', ambientVal, 100);
+            // Also clamp glow to the new shape brightness
+            const glow = Elements.controls.glowSlider;
+            if (glow && parseInt(glow.value) > ambientVal) {
+                glow.value = ambientVal;
+                updateSliderFill(glow);
+                setSliderDisplay('glowDisplay', ambientVal, 100);
+            }
+        }
+        throttledColorUpdate();
     });
     Elements.controls.lockCanvas.addEventListener('change', (e) => {
         AppState.isLocked = e.target.checked;
@@ -849,41 +895,68 @@ function setupEventListeners() {
     // Full surface illumination
     Elements.controls.fullSurface.addEventListener('click', () => {
         if (AppState.isFullyIlluminated) {
-            // If Full Surface is currently active, turn it off and restore previous value
             AppState.isFullyIlluminated = false;
             Elements.controls.fullSurface.classList.remove('active');
             Elements.controls.ambient.value = AppState.previousAmbientValue;
         } else {
-            // If Full Surface is not active, turn it on and save current value
             AppState.previousAmbientValue = Elements.controls.ambient.value;
             AppState.isFullyIlluminated = true;
             Elements.controls.fullSurface.classList.add('active');
             Elements.controls.ambient.value = 100;
+            // Shape brightness cannot be less than background — push it to 100 too
+            const sb = Elements.controls.shapeBrightness;
+            if (sb && parseInt(sb.value) < 100) {
+                sb.value = 100;
+                updateSliderFill(sb);
+                setSliderDisplay('shapeBrightnessDisplay', 100, 100);
+            }
         }
-        debouncedColorUpdate();
+        updateSliderFill(Elements.controls.ambient);
+        setSliderDisplay('ambientDisplay', Elements.controls.ambient.value, 100);
+        throttledColorUpdate();
     });
 
-    // Close controls when clicking outside shapes
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.shape') && !e.target.closest('.drawer')) {
-            document.querySelectorAll('.shape').forEach(shape => 
+    // Deselect shapes when pressing empty canvas space (not on a shape, bounding box, or drawer/overlay)
+    document.addEventListener('pointerdown', (e) => {
+        if (!e.target.closest('.shape') &&
+            !e.target.closest('.bounding-box') &&
+            !e.target.closest('.drawer') &&
+            !e.target.closest('.drawer-overlay') &&
+            !e.target.closest('.drawer-toggle')) {
+            document.querySelectorAll('.shape').forEach(shape =>
                 BoundingBoxManager.hide(shape));
-        }
-    });
-
-    // Add canvas click handler to deselect shapes when clicking empty space
-    Elements.canvas.addEventListener('pointerdown', (event) => {
-        // Only handle if clicking directly on canvas, not on shapes or other elements
-        if (event.target === Elements.canvas) {
-            // Hide all bounding boxes when clicking canvas
-            document.querySelectorAll('.bounding-box').forEach(box => {
-                box.style.display = 'none';
-            });
             AppState.selectedShape = null;
         }
     });
 
-    Elements.controls?.glowSlider?.addEventListener('input', updateGlowIntensity);
+    Elements.controls?.shapeBrightness?.addEventListener('input', (e) => {
+        // Clamp: shape brightness cannot go below background (ambient) brightness
+        const ambientVal = parseInt(Elements.controls.ambient.value);
+        if (parseInt(e.target.value) < ambientVal) {
+            e.target.value = ambientVal;
+        }
+        updateSliderFill(e.target);
+        setSliderDisplay('shapeBrightnessDisplay', e.target.value, 100);
+        // Clamp glow down if it now exceeds shape brightness
+        const glow = Elements.controls.glowSlider;
+        if (glow && parseInt(glow.value) > parseInt(e.target.value)) {
+            glow.value = e.target.value;
+            updateSliderFill(glow);
+            setSliderDisplay('glowDisplay', glow.value, 100);
+        }
+        throttledColorUpdate();
+    });
+
+    Elements.controls?.glowSlider?.addEventListener('input', (e) => {
+        // Clamp: glow cannot exceed shape brightness
+        const brightnessVal = parseInt(Elements.controls.shapeBrightness?.value ?? 100);
+        if (parseInt(e.target.value) > brightnessVal) {
+            e.target.value = brightnessVal;
+        }
+        updateSliderFill(e.target);
+        setSliderDisplay('glowDisplay', e.target.value, 100);
+        updateGlowIntensity();
+    });
 
     // Clear All button - Reset to base defaults
     const clearAllButton = document.getElementById('clearAll');
@@ -901,6 +974,7 @@ function setupEventListeners() {
             if (Elements.controls.ambient) Elements.controls.ambient.value = 0;
             if (Elements.controls.warmth) Elements.controls.warmth.value = 100;
             if (Elements.controls.glowSlider) Elements.controls.glowSlider.value = 0;
+            if (Elements.controls.shapeBrightness) Elements.controls.shapeBrightness.value = 100;
 
             // Reset RGB to white
             if (Elements.controls.rgb?.red) Elements.controls.rgb.red.value = 255;
@@ -934,6 +1008,20 @@ function setupEventListeners() {
             // Update all colors
             ColorManager.updateAllColors();
             updateGlowSliderState();
+
+            // Sync slider fills and value displays
+            updateSliderFill(Elements.controls.ambient);
+            updateSliderFill(Elements.controls.warmth);
+            updateSliderFill(Elements.controls.glowSlider);
+            updateSliderFill(Elements.controls.shapeBrightness);
+            updateSliderFill(Elements.controls.rgb.red);
+            updateSliderFill(Elements.controls.rgb.green);
+            updateSliderFill(Elements.controls.rgb.blue);
+            setSliderDisplay('ambientDisplay', 0, 100);
+            setSliderDisplay('warmthDisplay', 100, 100);
+            setSliderDisplay('glowDisplay', 0, 100);
+            setSliderDisplay('shapeBrightnessDisplay', 100, 100);
+            updateColorSwatch();
 
             // Clear saved state
             localStorage.removeItem('lightboxState');
@@ -984,8 +1072,22 @@ function initializeApp() {
         
         setupEventListeners();
         setupRGBControls();
-        debouncedColorUpdate();
+        throttledColorUpdate();
         updateGlowSliderState();
+
+        // Initialize slider fills and value display badges
+        updateSliderFill(Elements.controls.ambient);
+        updateSliderFill(Elements.controls.warmth);
+        updateSliderFill(Elements.controls.glowSlider);
+        updateSliderFill(Elements.controls.rgb.red);
+        updateSliderFill(Elements.controls.rgb.green);
+        updateSliderFill(Elements.controls.rgb.blue);
+        updateSliderFill(Elements.controls.shapeBrightness);
+        setSliderDisplay('ambientDisplay', Elements.controls.ambient?.value ?? 0, 100);
+        setSliderDisplay('warmthDisplay', Elements.controls.warmth?.value ?? 100, 100);
+        setSliderDisplay('glowDisplay', Elements.controls.glowSlider?.value ?? 0, 100);
+        setSliderDisplay('shapeBrightnessDisplay', Elements.controls.shapeBrightness?.value ?? 100, 100);
+        updateColorSwatch();
 
         // Register Service Worker for PWA functionality
         if ('serviceWorker' in navigator) {
@@ -1121,6 +1223,7 @@ const StateManager = {
                     ambient: Elements.controls?.ambient?.value ?? 0,
                     warmth: Elements.controls?.warmth?.value ?? 100,
                     glow: Elements.controls?.glowSlider?.value ?? 0,
+                    shapeBrightness: Elements.controls?.shapeBrightness?.value ?? 100,
                     rgb: {
                         red: Elements.controls?.rgb?.red?.value ?? 255,
                         green: Elements.controls?.rgb?.green?.value ?? 255,
@@ -1143,28 +1246,40 @@ const StateManager = {
 
                 // Restore settings
                 if (state?.settings) {
+                    // Map saved keys to Elements.controls property names
+                    const keyMap = { glow: 'glowSlider' };
+
                     Object.entries(state.settings).forEach(([key, value]) => {
                         if (key === 'rgb' && Elements.controls?.rgb) {
-                            // Restore RGB values
                             if (value.red !== undefined) Elements.controls.rgb.red.value = value.red;
                             if (value.green !== undefined) Elements.controls.rgb.green.value = value.green;
                             if (value.blue !== undefined) Elements.controls.rgb.blue.value = value.blue;
-
-                            // Update base color state
                             AppState.baseColor = [
                                 parseInt(value.red ?? 255),
                                 parseInt(value.green ?? 255),
                                 parseInt(value.blue ?? 255)
                             ];
-                        } else if (Elements.controls && Elements.controls[key]) {
-                            // Special handling for warmth - if it was saved as 0 (old default), use new default of 100
-                            if (key === 'warmth' && value === 0) {
-                                Elements.controls[key].value = 100;
-                            } else {
-                                Elements.controls[key].value = value;
+                        } else {
+                            const controlKey = keyMap[key] ?? key;
+                            const control = Elements.controls?.[controlKey];
+                            if (control) {
+                                // warmth saved as 0 means old default — upgrade to 100
+                                if (key === 'warmth' && value === 0) {
+                                    control.value = 100;
+                                // shapeBrightness missing from old saves — keep HTML default of 100
+                                } else if (key === 'shapeBrightness' && value === undefined) {
+                                    control.value = 100;
+                                } else {
+                                    control.value = value;
+                                }
                             }
                         }
                     });
+
+                    // If shapeBrightness wasn't in the saved state at all, ensure default
+                    if (state.settings.shapeBrightness === undefined && Elements.controls?.shapeBrightness) {
+                        Elements.controls.shapeBrightness.value = 100;
+                    }
                 }
 
                 // Restore shapes
@@ -1206,17 +1321,14 @@ const StateManager = {
                     updateGlowSliderState();
                 }
             } else {
-                // No saved state - ensure warmth starts at 100 (warmest)
-                if (Elements.controls?.warmth) {
-                    Elements.controls.warmth.value = 100;
-                }
+                // No saved state - apply first-run defaults
+                if (Elements.controls?.warmth) Elements.controls.warmth.value = 100;
+                if (Elements.controls?.shapeBrightness) Elements.controls.shapeBrightness.value = 100;
             }
         } catch (error) {
             console.error('Failed to restore state:', error);
-            // On error, ensure warmth defaults to warmest setting
-            if (Elements.controls?.warmth) {
-                Elements.controls.warmth.value = 100;
-            }
+            if (Elements.controls?.warmth) Elements.controls.warmth.value = 100;
+            if (Elements.controls?.shapeBrightness) Elements.controls.shapeBrightness.value = 100;
         }
     }
 };
@@ -1285,14 +1397,18 @@ function updateGlowSliderState() {
     const shapes = document.querySelectorAll('.shape');
     const glowSlider = document.getElementById('glowSlider');
     const glowLabel = document.querySelector('label[for="glowSlider"]');
+    const glowDisplay = document.getElementById('glowDisplay');
     
     if (shapes.length === 0) {
         glowSlider.disabled = true;
         glowSlider.value = 0;
         glowLabel.classList.add('disabled');
         document.documentElement.style.setProperty('--glow-intensity', '0');
+        updateSliderFill(glowSlider);
+        if (glowDisplay) { glowDisplay.textContent = '0%'; glowDisplay.style.opacity = '0.4'; }
     } else {
         glowSlider.disabled = false;
         glowLabel.classList.remove('disabled');
+        if (glowDisplay) glowDisplay.style.opacity = '';
     }
 }
