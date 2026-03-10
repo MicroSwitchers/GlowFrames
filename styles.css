@@ -458,7 +458,7 @@ body {
     padding: 14px var(--spacing-xs) 12px;
     background: linear-gradient(160deg, #202026 0%, #18181c 100%);
     border: 1px solid rgba(255, 255, 255, 0.07);
-    color: var(--color-text-primary);
+    color: #FFFFFF;
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
@@ -1507,23 +1507,13 @@ input[type="range"]:disabled::-webkit-slider-thumb {
     }
 }
 
-/* Light Mode Adjustments */
+/* Light Mode Adjustments - Kept UI text dark-mode native due to static dark panels */
 @media (prefers-color-scheme: light) {
     :root {
-        --color-background: #FAFAFA;
-        --color-surface: #FFFFFF;
-        --color-surface-light: #F5F5F5;
-        --color-surface-lighter: #EEEEEE;
-        --color-text-primary: #1A1A1A;
-        --color-text-secondary: rgba(0, 0, 0, 0.7);
-        --color-text-tertiary: rgba(0, 0, 0, 0.5);
+        --color-background: #0A0A0B; /* Enforce dark background for CVI therapy */
     }
 
     .drawer {
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
-    }
-
-    .shape {
-        background: #1A1A1A;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
     }
 }
