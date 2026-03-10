@@ -26,6 +26,8 @@ textarea {
 
 /* CSS Custom Properties */
 :root {
+    color-scheme: dark;
+
     /* Professional Color Palette */
     --color-background: #0A0A0B;
     --color-surface: #141417;
