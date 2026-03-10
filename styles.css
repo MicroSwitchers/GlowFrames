@@ -458,7 +458,8 @@ body {
     padding: 14px var(--spacing-xs) 12px;
     background: linear-gradient(160deg, #202026 0%, #18181c 100%);
     border: 1px solid rgba(255, 255, 255, 0.07);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
@@ -527,6 +528,8 @@ body {
     width: 26px;
     height: 26px;
     opacity: 0.8;
+    color: #FFFFFF !important;
+    stroke: #FFFFFF !important;
     transition: opacity var(--transition-normal), transform var(--transition-normal);
 }
 
